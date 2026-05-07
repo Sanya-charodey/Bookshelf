@@ -3,10 +3,13 @@
         <h1 class="title">Каталог книг</h1>
 
         <div v-if="loading">Загрузка...</div>
-        <div v-else-if="error">{{ error }}</div>
+        <div v-else-if="error">
+            {{ error }}
+            <button @click="loadBooks">Попробовать снова</button>
+        </div>
 
         <div class="books" v-else>
-            <BookCard v-for="book in store.books" :key="book.id" :book="book" />
+            <BookCard v-for="book in store.filteredBooks" :key="book.id" :book="book" />
         </div>
     </main>
 </template>
@@ -24,13 +27,26 @@ onMounted(async () => {
     loading.value = true
     try {
         await store.fetchBooks('subject:fantasy')
-        console.log('количество книг:', store.books.length)
     } catch {
         error.value = 'Не удалось загрузить книги'
     } finally {
         loading.value = false
     }
 })
+
+const loadBooks = async () => {
+    loading.value = true
+    error.value = null
+    try {
+        await store.fetchBooks()
+    } catch {
+        error.value = 'Не удалось загрузить книги'
+    } finally {
+        loading.value = false
+    }
+}
+
+onMounted(loadBooks)
 </script>
 
 <style scoped>

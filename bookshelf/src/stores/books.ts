@@ -13,10 +13,12 @@ export const useBookStore = defineStore('book', () => {
   const searchBooks = ref<Book[]>([])
   const searchQuery = ref('')
   const selectBook = ref<Book | null>(null)
+  const selectedGenre = ref<string | null>(null)
 
   const BASE_URL = 'https://www.googleapis.com/books/v1'
+  const DEFAULT_QUERY = 'subject:fantasy'
 
-  const fetchBooks = async (query: string): Promise<void> => {
+  const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
     const response = await axios.get<BookResp>(`${BASE_URL}/volumes`, {
       params: {
         q: query,
@@ -54,6 +56,22 @@ export const useBookStore = defineStore('book', () => {
     return [...new Set(genres)]
   })
 
+  const selectGenre = (genre: string) => {
+    selectedGenre.value = selectedGenre.value === genre ? null : genre
+  }
+
+  const filteredBooks = computed(() => {
+    if (searchQuery.value.trim()) return searchBooks.value
+
+    if (!selectedGenre.value) return books.value
+
+    return books.value.filter((book) => book.volumeInfo.categories?.includes(selectedGenre.value!))
+  })
+
+  const displayBooks = computed(() => {
+    return searchQuery.value.trim() ? searchBooks.value : books.value
+  })
+
   return {
     books,
     fetchBooks,
@@ -63,5 +81,9 @@ export const useBookStore = defineStore('book', () => {
     selectBook,
     searchQuery,
     allGenres,
+    selectGenre,
+    selectedGenre,
+    filteredBooks,
+    displayBooks,
   }
 })

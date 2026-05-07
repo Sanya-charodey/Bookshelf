@@ -14,7 +14,7 @@
                 ⭐ {{ book.volumeInfo.averageRating }}
             </div>
 
-            <p class="card__description">{{ description }}</p>
+            <p class="card__description">{{ shortDescription }}</p>
         </div>
     </div>
 </template>
@@ -28,7 +28,7 @@ import { useBookInfo } from '@/composables/useBookInfo'
 
 const props = defineProps<{ book: Book }>()
 const router = useRouter()
-const { thumbnail, authors, description } = useBookInfo(props.book)
+const { thumbnail, authors, description } = useBookInfo(() => props.book)
 
 const year = computed(() =>
     props.book.volumeInfo.publishedDate?.slice(0, 4) ?? ''
@@ -37,6 +37,8 @@ const year = computed(() =>
 const goToBook = () => {
     router.push(`/book/${props.book.id}`)
 }
+
+const shortDescription = computed(() => description.value.length > 120 ? description.value.slice(0, 120) + '...' : description.value)
 </script>
 
 <style scoped>

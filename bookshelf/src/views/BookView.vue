@@ -35,12 +35,8 @@
 
                 <p class="book__description">{{ description }}</p>
 
-                <a>
-                    v-if="store.selectBook.volumeInfo.previewLink"
-                    :href="store.selectBook.volumeInfo.previewLink"
-                    target="_blank"
-                    class="book__link"
-                    >
+                <a v-if="store.selectBook.volumeInfo.previewLink" :href="store.selectBook.volumeInfo.previewLink"
+                    target="_blank" class="book__link">
                     Читать превью →
                 </a>
             </div>
@@ -49,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBookStore } from '@/stores/books'
 import { useBookInfo } from '@/composables/useBookInfo'
@@ -57,7 +53,7 @@ import { useBookInfo } from '@/composables/useBookInfo'
 const store = useBookStore()
 const route = useRoute()
 const router = useRouter()
-const { thumbnail, authors, description } = useBookInfo(store.selectBook!)
+const { thumbnail, authors, description } = useBookInfo(() => store.selectBook)
 
 const loading = ref(false)
 const error = ref<string | null>(null)

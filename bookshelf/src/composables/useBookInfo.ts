@@ -1,17 +1,20 @@
-import { computed } from 'vue'
+import { computed, toValue } from 'vue'
 import type { Book } from '@/types/book'
 
-export const useBookInfo = (book: Book) => {
+export const useBookInfo = (book: () => Book | null) => {
+  const b = computed(() => toValue(book))
+
   const thumbnail = computed(
-    () => book.volumeInfo.imageLinks?.thumbnail?.replace('http://', 'https://') ?? null,
+    () => b.value?.volumeInfo?.imageLinks?.thumbnail?.replace('http://', 'https://') ?? null,
   )
 
-  const authors = computed(() => book.volumeInfo.authors?.join(', ') ?? 'Автор неизвестен')
+  const authors = computed(() => b.value?.volumeInfo?.authors?.join(', ') ?? 'Автор неизвестен')
 
   const description = computed(() => {
-    const desc = book.volumeInfo.description
+    const desc = b.value?.volumeInfo?.description
     if (!desc) return 'Описание отсутствует'
-    return desc.length > 120 ? desc.slice(0, 120) + '...' : desc
+    return desc.replace(/<[^>]*>/g, '').trim()
   })
+
   return { thumbnail, authors, description }
 }

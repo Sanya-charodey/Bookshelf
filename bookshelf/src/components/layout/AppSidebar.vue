@@ -3,16 +3,19 @@
 
         <div class="sidebar__wrap-btn">
             <button class="sidebar__my-book">Мои книги</button>
-            <form class="sidebar__search">
-                <input class="sidebar__input" type="search" placeholder="Поиск">
+            <form class="sidebar__search" @submit.prevent>
+                <input class="sidebar__input" type="search" placeholder="Поиск" v-model="store.searchQuery"
+                    @input="onSearch">
             </form>
         </div>
 
-        <span class="sidebar__text">Библиотека</span>
+        <span class="sidebar__text">Жанры:</span>
 
         <nav class="sidebar__nav" aria-label="Навигация по жанрам">
             <ul class="sidebar__list">
-                <li class="sidebar__item" v-for="genre in store.allGenres" :key="genre">
+                <li class="sidebar__item" v-for="genre in store.allGenres" :key="genre"
+                    :class="{ 'sidebar__item--active': store.selectedGenre === genre }"
+                    @click="store.selectGenre(genre)">
                     {{ genre }}
                 </li>
             </ul>
@@ -25,6 +28,15 @@
 import { useBookStore } from '@/stores/books';
 
 const store = useBookStore()
+
+let debounceTimer: ReturnType<typeof setTimeout>
+
+const onSearch = () => {
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+        store.fetchSearchBooks()
+    }, 500)
+}
 </script>
 
 <style scoped>
@@ -32,5 +44,14 @@ const store = useBookStore()
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.sidebar__item {
+    cursor: pointer;
+}
+
+.sidebar__item--active {
+    font-weight: bold;
+    color: darkblue
 }
 </style>
