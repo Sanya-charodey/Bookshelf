@@ -1,13 +1,3 @@
-<script setup lang="ts">
-const props = withDefaults(defineProps<{
-    size?: number
-    showText?: boolean
-}>(), {
-    size: 36,
-    showText: true
-})
-</script>
-
 <template>
     <div class="logo" :style="{ gap: props.showText ? '10px' : '0' }">
         <svg :width="props.size" :height="props.size" viewBox="0 0 36 36" fill="none"
@@ -34,6 +24,18 @@ const props = withDefaults(defineProps<{
         <span v-if="props.showText" class="logo-text">Bookshelf</span>
     </div>
 </template>
+
+<script setup lang="ts">
+const props = withDefaults(defineProps<{
+    size?: number
+    showText?: boolean
+}>(), {
+    size: 36,
+    showText: true
+})
+</script>
+
+
 <style scoped>
 .logo {
     display: flex;

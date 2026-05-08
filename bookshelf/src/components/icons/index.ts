@@ -1,0 +1,7 @@
+export { default as IconCalendar } from './IconCalendar.vue'
+export { default as IconPages } from './IconPages.vue'
+export { default as IconStar } from './IconStar.vue'
+export { default as IconPlanned } from './IconPlanned.vue'
+export { default as IconReading } from './IconReading.vue'
+export { default as IconFinished } from './IconFinished.vue'
+export { default as StatusArrow } from './StatusArrow.vue'
