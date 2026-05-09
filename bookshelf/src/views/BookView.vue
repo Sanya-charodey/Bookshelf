@@ -2,8 +2,8 @@
     <main class="book-view">
         <button class="back-btn" @click="router.back()">← Назад</button>
 
-        <div v-if="loading" class="state">Загрузка...</div>
-        <div v-else-if="error" class="state">{{ error }}</div>
+        <div v-if="store.isFetching" class="state">Загрузка...</div>
+        <div v-else-if="store.error" class="state">{{ store.error }}</div>
 
         <div v-else-if="store.selectBook" class="book">
             <div class="book__wrap">
@@ -83,8 +83,6 @@ const route = useRoute()
 const router = useRouter()
 const { thumbnail, authors, description } = useBookInfo(() => store.selectBook)
 
-const loading = ref(false)
-const error = ref<string | null>(null)
 const dropdownOpen = ref(false)
 
 const id = route.params.id as string
@@ -137,14 +135,7 @@ function handleClickOutside(e: MouseEvent) {
 }
 
 onMounted(async () => {
-    loading.value = true
-    try {
-        await store.fetchBookId(id)
-    } catch {
-        error.value = 'Не удалось загрузить книгу'
-    } finally {
-        loading.value = false
-    }
+    store.fetchBookId(id)
     document.addEventListener('click', handleClickOutside)
 })
 

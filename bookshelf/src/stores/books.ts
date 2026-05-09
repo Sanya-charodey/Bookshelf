@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import axios from 'axios'
 import type { Book } from '@/types/book'
+import { isAxiosError } from 'axios'
 
 interface BookResp {
   totalItems: number
@@ -14,6 +15,8 @@ export const useBookStore = defineStore('book', () => {
   const searchQuery = ref('')
   const selectBook = ref<Book | null>(null)
   const selectedGenre = ref<string | null>(null)
+  const isFetching = ref(false)
+  const error = ref<string | null>(null)
 
   const BASE_URL = 'https://www.googleapis.com/books/v1'
   const DEFAULT_QUERY = 'subject:fantasy'
@@ -43,12 +46,30 @@ export const useBookStore = defineStore('book', () => {
   }
 
   const fetchBookId = async (id: string): Promise<void> => {
-    const response = await axios.get<Book>(`${BASE_URL}/volumes/${id}`, {
-      params: {
-        key: import.meta.env.VITE_GOOGLE_BOOKS_API_KEY,
-      },
-    })
-    selectBook.value = response.data
+    isFetching.value = true
+    error.value = null
+
+    try {
+      const response = await axios.get<Book>(`${BASE_URL}/volumes/${id}`, {
+        params: {
+          key: import.meta.env.VITE_GOOGLE_BOOKS_API_KEY,
+        },
+      })
+      selectBook.value = response.data
+    } catch (e) {
+      console.error('Ошибка загрузки книги:', e)
+      if (isAxiosError(e)) {
+        if (e.response?.status === 503) {
+          error.value = 'Упс, что-то пошло не так. Попробуйте снова.'
+        } else {
+          error.value = 'Ошибка соединения с сервером.'
+        }
+      } else {
+        error.value = 'Неизвестная'
+      }
+    } finally {
+      isFetching.value = false
+    }
   }
 
   const allGenres = computed(() => {
@@ -85,5 +106,7 @@ export const useBookStore = defineStore('book', () => {
     selectedGenre,
     filteredBooks,
     displayBooks,
+    isFetching,
+    error,
   }
 })
