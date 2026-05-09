@@ -76,18 +76,13 @@ import { useBookStore } from '@/stores/books'
 import { useBookInfo } from '@/composables/useBookInfo'
 import type { StatusValue, StatusOption } from '@/types/status'
 import { IconCalendar, IconFinished, IconPages, IconPlanned, IconReading, StatusArrow, IconStar } from '@/components/icons/'
-
+import { useStatusStore } from '@/stores/status'
 
 const store = useBookStore()
 const route = useRoute()
 const router = useRouter()
 const { thumbnail, authors, description } = useBookInfo(() => store.selectBook)
-
-const dropdownOpen = ref(false)
-
-const id = route.params.id as string
-
-const STORAGE_KEY = 'book_statuses'
+const statusStore = useStatusStore()
 
 const statusOptions: StatusOption[] = [
     { value: 'planned', label: 'Планирую прочесть', icon: IconPlanned },
@@ -95,36 +90,18 @@ const statusOptions: StatusOption[] = [
     { value: 'finished', label: 'Прочитано', icon: IconFinished },
 ]
 
-const allStatuses = ref<Record<string, StatusValue>>(
-    JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}')
-)
 
-const selectedStatus = computed(() => allStatuses.value[id] ?? null)
+const id = route.params.id as string
+const dropdownOpen = ref(false)
+
+const selectedStatus = computed(() => statusStore.getStatus(id))
 
 const statusLabel = computed(() =>
     statusOptions.find(o => o.value === selectedStatus.value)?.label ?? ''
 )
 
-function saveStatuses() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allStatuses.value))
-}
-
 function toggleDropdown() {
     dropdownOpen.value = !dropdownOpen.value
-}
-
-function selectStatus(value: StatusValue) {
-    allStatuses.value = { ...allStatuses.value, [id]: value }
-    saveStatuses()
-    dropdownOpen.value = false
-}
-
-function removeStatus() {
-    const updated = { ...allStatuses.value }
-    delete updated[id]
-    allStatuses.value = updated
-    saveStatuses()
-    dropdownOpen.value = false
 }
 
 function handleClickOutside(e: MouseEvent) {
@@ -132,6 +109,16 @@ function handleClickOutside(e: MouseEvent) {
     if (!target.closest('.book__status')) {
         dropdownOpen.value = false
     }
+}
+
+function selectStatus(value: StatusValue) {
+    statusStore.setStatus(id, value)
+    dropdownOpen.value = false
+}
+
+function removeStatus() {
+    statusStore.removeStatus(id)
+    dropdownOpen.value = false
 }
 
 onMounted(async () => {
