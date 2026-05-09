@@ -14,7 +14,7 @@
 
                 <div class="book__status">
                     <button class="status-btn" :class="{ 'status-btn--active': selectedStatus }"
-                        @click="toggleDropdown">
+                        @click.stop="toggleDropdown">
                         <span>{{ selectedStatus ? statusLabel : '+ В список' }}</span>
                         <StatusArrow :open="dropdownOpen" />
                     </button>
@@ -90,8 +90,9 @@ const statusOptions: StatusOption[] = [
     { value: 'finished', label: 'Прочитано', icon: IconFinished },
 ]
 
+const routeId = route.params.id
+const id = typeof route.params.id === 'string' ? route.params.id : ''
 
-const id = route.params.id as string
 const dropdownOpen = ref(false)
 
 const selectedStatus = computed(() => statusStore.getStatus(id))
@@ -105,10 +106,14 @@ function toggleDropdown() {
 }
 
 function handleClickOutside(e: MouseEvent) {
-    const target = e.target as HTMLElement
-    if (!target.closest('.book__status')) {
-        dropdownOpen.value = false
+    if (!(e.target instanceof Node)) return
+
+    const target = e.target as Element
+    if (!dropdownOpen.value || target.closest('book_status')) {
+        return
     }
+
+    dropdownOpen.value = false
 }
 
 function selectStatus(value: StatusValue) {
