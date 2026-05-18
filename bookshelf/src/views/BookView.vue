@@ -2,8 +2,8 @@
     <main class="book-view">
         <button class="back-btn" @click="router.back()">← Назад</button>
 
-        <div v-if="loading" class="state">Загрузка...</div>
-        <div v-else-if="error" class="state">{{ error }}</div>
+        <div v-if="store.isFetching" class="state">Загрузка...</div>
+        <div v-else-if="store.error" class="state">{{ store.error }}</div>
 
         <div v-else-if="store.selectBook" class="book">
             <div class="book__wrap">
@@ -14,7 +14,7 @@
 
                 <div class="book__status">
                     <button class="status-btn" :class="{ 'status-btn--active': selectedStatus }"
-                        @click="toggleDropdown">
+                        @click.stop="toggleDropdown">
                         <span>{{ selectedStatus ? statusLabel : '+ В список' }}</span>
                         <StatusArrow :open="dropdownOpen" />
                     </button>
@@ -76,20 +76,13 @@ import { useBookStore } from '@/stores/books'
 import { useBookInfo } from '@/composables/useBookInfo'
 import type { StatusValue, StatusOption } from '@/types/status'
 import { IconCalendar, IconFinished, IconPages, IconPlanned, IconReading, StatusArrow, IconStar } from '@/components/icons/'
-
+import { useStatusStore } from '@/stores/status'
 
 const store = useBookStore()
 const route = useRoute()
 const router = useRouter()
 const { thumbnail, authors, description } = useBookInfo(() => store.selectBook)
-
-const loading = ref(false)
-const error = ref<string | null>(null)
-const dropdownOpen = ref(false)
-
-const id = route.params.id as string
-
-const STORAGE_KEY = 'book_statuses'
+const statusStore = useStatusStore()
 
 const statusOptions: StatusOption[] = [
     { value: 'planned', label: 'Планирую прочесть', icon: IconPlanned },
@@ -97,54 +90,44 @@ const statusOptions: StatusOption[] = [
     { value: 'finished', label: 'Прочитано', icon: IconFinished },
 ]
 
-const allStatuses = ref<Record<string, StatusValue>>(
-    JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}')
-)
+const routeId = route.params.id
+const id = typeof route.params.id === 'string' ? route.params.id : ''
 
-const selectedStatus = computed(() => allStatuses.value[id] ?? null)
+const dropdownOpen = ref(false)
+
+const selectedStatus = computed(() => statusStore.getStatus(id))
 
 const statusLabel = computed(() =>
     statusOptions.find(o => o.value === selectedStatus.value)?.label ?? ''
 )
 
-function saveStatuses() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allStatuses.value))
-}
-
 function toggleDropdown() {
     dropdownOpen.value = !dropdownOpen.value
 }
 
+function handleClickOutside(e: MouseEvent) {
+    if (!(e.target instanceof Node)) return
+
+    const target = e.target as Element
+    if (!dropdownOpen.value || target.closest('book_status')) {
+        return
+    }
+
+    dropdownOpen.value = false
+}
+
 function selectStatus(value: StatusValue) {
-    allStatuses.value = { ...allStatuses.value, [id]: value }
-    saveStatuses()
+    statusStore.setStatus(id, value)
     dropdownOpen.value = false
 }
 
 function removeStatus() {
-    const updated = { ...allStatuses.value }
-    delete updated[id]
-    allStatuses.value = updated
-    saveStatuses()
+    statusStore.removeStatus(id)
     dropdownOpen.value = false
 }
 
-function handleClickOutside(e: MouseEvent) {
-    const target = e.target as HTMLElement
-    if (!target.closest('.book__status')) {
-        dropdownOpen.value = false
-    }
-}
-
 onMounted(async () => {
-    loading.value = true
-    try {
-        await store.fetchBookId(id)
-    } catch {
-        error.value = 'Не удалось загрузить книгу'
-    } finally {
-        loading.value = false
-    }
+    store.fetchBookId(id)
     document.addEventListener('click', handleClickOutside)
 })
 
