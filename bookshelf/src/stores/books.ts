@@ -18,6 +18,7 @@ export const useBookStore = defineStore('book', () => {
   const isFetching = ref(false)
   const error = ref<string | null>(null)
 
+  const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
   const BASE_URL = 'https://www.googleapis.com/books/v1'
   const DEFAULT_QUERY = 'subject:fantasy'
 
@@ -26,7 +27,7 @@ export const useBookStore = defineStore('book', () => {
       params: {
         q: query,
         maxResults: 40,
-        key: import.meta.env.VITE_GOOGLE_BOOKS_API_KEY,
+        key: API_KEY,
       },
     })
     books.value = response.data.items
@@ -39,7 +40,7 @@ export const useBookStore = defineStore('book', () => {
       params: {
         q: searchQuery.value,
         maxResults: 40,
-        key: import.meta.env.VITE_GOOGLE_BOOKS_API_KEY,
+        key: API_KEY,
       },
     })
     searchBooks.value = response.data.items
@@ -52,7 +53,7 @@ export const useBookStore = defineStore('book', () => {
     try {
       const response = await axios.get<Book>(`${BASE_URL}/volumes/${id}`, {
         params: {
-          key: import.meta.env.VITE_GOOGLE_BOOKS_API_KEY,
+          key: API_KEY,
         },
       })
       selectBook.value = response.data
