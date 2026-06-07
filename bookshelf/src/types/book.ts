@@ -11,7 +11,7 @@ export interface volumeInfo {
   publishedDate: string
   pageCount: number
   categories: string[]
-  imageLinks: ImageLinks
+  imageLinks?: ImageLinks
   previewLink?: string
 }
 

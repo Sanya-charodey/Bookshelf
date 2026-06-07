@@ -3,11 +3,14 @@ import { computed, ref } from 'vue'
 import axios from 'axios'
 import type { Book } from '@/types/book'
 import { isAxiosError } from 'axios'
-
-interface BookResp {
-  totalItems: number
-  items: Book[]
-}
+import {
+  mapSearchDocToBook,
+  mapWorkToBook,
+  OPEN_LIBRARY_SEARCH_FIELDS,
+  type OpenLibraryAuthor,
+  type OpenLibrarySearchResponse,
+  type OpenLibraryWork,
+} from '@/api/openLibrary'
 
 export const useBookStore = defineStore('book', () => {
   const books = ref<Book[]>([])
@@ -18,32 +21,31 @@ export const useBookStore = defineStore('book', () => {
   const isFetching = ref(false)
   const error = ref<string | null>(null)
 
-  const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
-  const BASE_URL = 'https://www.googleapis.com/books/v1'
+  const BASE_URL = 'https://openlibrary.org'
   const DEFAULT_QUERY = 'subject:fantasy'
 
   const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
-    const response = await axios.get<BookResp>(`${BASE_URL}/volumes`, {
+    const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
       params: {
         q: query,
-        maxResults: 40,
-        key: API_KEY,
+        limit: 40,
+        fields: OPEN_LIBRARY_SEARCH_FIELDS,
       },
     })
-    books.value = response.data.items
+    books.value = (response.data.docs ?? []).map(mapSearchDocToBook)
   }
 
   const fetchSearchBooks = async (): Promise<void> => {
     if (!searchQuery.value.trim()) return
 
-    const response = await axios.get<BookResp>(`${BASE_URL}/volumes`, {
+    const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
       params: {
         q: searchQuery.value,
-        maxResults: 40,
-        key: API_KEY,
+        limit: 40,
+        fields: OPEN_LIBRARY_SEARCH_FIELDS,
       },
     })
-    searchBooks.value = response.data.items
+    searchBooks.value = (response.data.docs ?? []).map(mapSearchDocToBook)
   }
 
   const fetchBookId = async (id: string): Promise<void> => {
@@ -51,12 +53,18 @@ export const useBookStore = defineStore('book', () => {
     error.value = null
 
     try {
-      const response = await axios.get<Book>(`${BASE_URL}/volumes/${id}`, {
-        params: {
-          key: API_KEY,
-        },
-      })
-      selectBook.value = response.data
+      const workResponse = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${id}.json`)
+      const work = workResponse.data
+
+      const authorKeys = work.authors?.map((entry) => entry.author.key) ?? []
+      const authorResponses = await Promise.all(
+        authorKeys.map((key) => axios.get<OpenLibraryAuthor>(`${BASE_URL}${key}.json`)),
+      )
+      const authorNames = authorResponses
+        .map((response) => response.data.name)
+        .filter((name): name is string => Boolean(name))
+
+      selectBook.value = mapWorkToBook(work, authorNames)
     } catch (e) {
       console.error('Ошибка загрузки книги:', e)
       if (isAxiosError(e)) {
