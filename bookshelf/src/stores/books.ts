@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import axios from 'axios'
 import type { Book } from '@/types/book'
 import { isAxiosError } from 'axios'
@@ -12,6 +12,7 @@ import {
   type OpenLibrarySearchResponse,
   type OpenLibraryWork,
 } from '@/api/openLibrary'
+import { searchCache, bookDetailCache } from '@/api/bookCache'
 
 export const useBookStore = defineStore('book', () => {
   const books = ref<Book[]>([])
@@ -25,35 +26,36 @@ export const useBookStore = defineStore('book', () => {
   const BASE_URL = 'https://openlibrary.org'
   const DEFAULT_QUERY = 'subject:fantasy'
 
-  const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
+  function loadCached<T>(data: T | undefined, assign: (data: T) => void) {
+    if (data === undefined) return false
+    assign(data)
+    return true
+  }
+
+  async function executeSearch(query: string, target: Ref<Book[]>) {
     const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
-      params: {
-        q: query,
-        limit: 40,
-        fields: OPEN_LIBRARY_SEARCH_FIELDS,
-      },
+      params: { q: query, limit: 40, fields: OPEN_LIBRARY_SEARCH_FIELDS },
     })
-    books.value = await enrichBooksWithDescriptions(
+    target.value = await enrichBooksWithDescriptions(
       (response.data.docs ?? []).map(mapSearchDocToBook),
     )
+    searchCache.set(query, target.value)
+  }
+
+  const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
+    if (loadCached(searchCache.get(query), data => { books.value = data })) return
+    await executeSearch(query, books)
   }
 
   const fetchSearchBooks = async (): Promise<void> => {
     if (!searchQuery.value.trim()) return
-
-    const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
-      params: {
-        q: searchQuery.value,
-        limit: 40,
-        fields: OPEN_LIBRARY_SEARCH_FIELDS,
-      },
-    })
-    searchBooks.value = await enrichBooksWithDescriptions(
-      (response.data.docs ?? []).map(mapSearchDocToBook),
-    )
+    if (loadCached(searchCache.get(searchQuery.value), data => { searchBooks.value = data })) return
+    await executeSearch(searchQuery.value, searchBooks)
   }
 
   const fetchBookId = async (id: string): Promise<void> => {
+    if (loadCached(bookDetailCache.get(id), data => { selectBook.value = data })) return
+
     isFetching.value = true
     error.value = null
 
@@ -71,13 +73,15 @@ export const useBookStore = defineStore('book', () => {
 
       selectBook.value = mapWorkToBook(work, authorNames)
 
-      const cachedBook =
+      const existingBook =
         books.value.find((book) => book.id === id) ??
         searchBooks.value.find((book) => book.id === id)
 
-      if (cachedBook?.volumeInfo.averageRating != null) {
-        selectBook.value.volumeInfo.averageRating = cachedBook.volumeInfo.averageRating
+      if (existingBook?.volumeInfo.averageRating != null) {
+        selectBook.value.volumeInfo.averageRating = existingBook.volumeInfo.averageRating
       }
+
+      bookDetailCache.set(id, selectBook.value)
     } catch (e) {
       console.error('Ошибка загрузки книги:', e)
       if (isAxiosError(e)) {

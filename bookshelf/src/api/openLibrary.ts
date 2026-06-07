@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { Book, ImageLinks } from '@/types/book'
+import { descriptionCache } from './bookCache'
 
 const BASE_URL = 'https://openlibrary.org'
 const COVERS_URL = 'https://covers.openlibrary.org'
@@ -105,9 +106,16 @@ export async function enrichBooksWithDescriptions(bookList: Book[]): Promise<Boo
     bookList.map(async (book) => {
       if (book.volumeInfo.description.trim()) return book
 
+      const cached = descriptionCache.get(book.id)
+      if (cached !== undefined) {
+        if (!cached) return book
+        return { ...book, volumeInfo: { ...book.volumeInfo, description: cached } }
+      }
+
       try {
         const { data } = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${book.id}.json`)
         const description = parseTextField(data.description)
+        descriptionCache.set(book.id, description)
         if (!description) return book
 
         return {
@@ -115,6 +123,7 @@ export async function enrichBooksWithDescriptions(bookList: Book[]): Promise<Boo
           volumeInfo: { ...book.volumeInfo, description },
         }
       } catch {
+        descriptionCache.set(book.id, '')
         return book
       }
     }),
