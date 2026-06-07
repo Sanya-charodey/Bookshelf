@@ -16,5 +16,11 @@ export const useBookInfo = (book: () => Book | null) => {
     return desc.replace(/<[^>]*>/g, '').trim()
   })
 
-  return { thumbnail, authors, description }
+  const rating = computed(() => {
+    const value = b.value?.volumeInfo?.averageRating
+    if (value == null) return null
+    return value.toFixed(1)
+  })
+
+  return { thumbnail, authors, description, rating }
 }

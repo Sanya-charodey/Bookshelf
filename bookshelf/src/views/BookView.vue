@@ -47,8 +47,8 @@
                     <span v-if="store.selectBook.volumeInfo.pageCount">
                         <IconPages /> {{ store.selectBook.volumeInfo.pageCount }} стр.
                     </span>
-                    <span v-if="store.selectBook.volumeInfo.averageRating">
-                        <IconStar /> {{ store.selectBook.volumeInfo.averageRating }}
+                    <span v-if="rating">
+                        <IconStar /> {{ rating }}
                     </span>
                 </div>
 
@@ -81,7 +81,7 @@ import { useStatusStore } from '@/stores/status'
 const store = useBookStore()
 const route = useRoute()
 const router = useRouter()
-const { thumbnail, authors, description } = useBookInfo(() => store.selectBook)
+const { thumbnail, authors, description, rating } = useBookInfo(() => store.selectBook)
 const statusStore = useStatusStore()
 
 const statusOptions: StatusOption[] = [

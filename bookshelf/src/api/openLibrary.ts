@@ -1,3 +1,4 @@
+import axios from 'axios'
 import type { Book, ImageLinks } from '@/types/book'
 
 const BASE_URL = 'https://openlibrary.org'
@@ -13,7 +14,7 @@ export interface OpenLibrarySearchDoc {
   first_publish_year?: number
   cover_i?: number
   subject?: string[]
-  first_sentence?: string | { value?: string }
+  first_sentence?: string | { value?: string } | string[]
   ratings_average?: number
   number_of_pages_median?: number
 }
@@ -48,10 +49,16 @@ function coverUrl(coverId?: number): ImageLinks | undefined {
   return { smallThumbnail: url, thumbnail: url }
 }
 
-function parseTextField(value?: string | { value?: string }): string {
+function parseTextField(value?: string | { value?: string } | string[]): string {
   if (!value) return ''
   if (typeof value === 'string') return value
+  if (Array.isArray(value)) return value[0] ?? ''
   return value.value ?? ''
+}
+
+export function formatRating(rating?: number): number | undefined {
+  if (rating == null) return undefined
+  return Math.round(rating * 10) / 10
 }
 
 export function mapSearchDocToBook(doc: OpenLibrarySearchDoc): Book {
@@ -67,7 +74,7 @@ export function mapSearchDocToBook(doc: OpenLibrarySearchDoc): Book {
       pageCount: doc.number_of_pages_median ?? 0,
       categories: doc.subject ?? [],
       imageLinks: coverUrl(doc.cover_i),
-      averageRating: doc.ratings_average,
+      averageRating: formatRating(doc.ratings_average),
       previewLink: `${BASE_URL}/works/${id}`,
     },
   }
@@ -91,4 +98,25 @@ export function mapWorkToBook(work: OpenLibraryWork, authorNames: string[]): Boo
       previewLink,
     },
   }
+}
+
+export async function enrichBooksWithDescriptions(bookList: Book[]): Promise<Book[]> {
+  return Promise.all(
+    bookList.map(async (book) => {
+      if (book.volumeInfo.description.trim()) return book
+
+      try {
+        const { data } = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${book.id}.json`)
+        const description = parseTextField(data.description)
+        if (!description) return book
+
+        return {
+          ...book,
+          volumeInfo: { ...book.volumeInfo, description },
+        }
+      } catch {
+        return book
+      }
+    }),
+  )
 }

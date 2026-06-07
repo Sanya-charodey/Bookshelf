@@ -10,8 +10,8 @@
             <p class="card__authors">{{ authors }}</p>
             <p class="card__year">{{ year }}</p>
 
-            <div class="card__rating" v-if="book.volumeInfo.averageRating">
-                ⭐ {{ book.volumeInfo.averageRating }}
+            <div class="card__rating" v-if="rating">
+                ⭐ {{ rating }}
             </div>
 
             <p class="card__description">{{ shortDescription }}</p>
@@ -28,7 +28,7 @@ import { useBookInfo } from '@/composables/useBookInfo'
 
 const props = defineProps<{ book: Book }>()
 const router = useRouter()
-const { thumbnail, authors, description } = useBookInfo(() => props.book)
+const { thumbnail, authors, description, rating } = useBookInfo(() => props.book)
 
 const year = computed(() =>
     props.book.volumeInfo.publishedDate?.slice(0, 4) ?? ''

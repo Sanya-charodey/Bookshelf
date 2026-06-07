@@ -4,6 +4,7 @@ import axios from 'axios'
 import type { Book } from '@/types/book'
 import { isAxiosError } from 'axios'
 import {
+  enrichBooksWithDescriptions,
   mapSearchDocToBook,
   mapWorkToBook,
   OPEN_LIBRARY_SEARCH_FIELDS,
@@ -32,7 +33,9 @@ export const useBookStore = defineStore('book', () => {
         fields: OPEN_LIBRARY_SEARCH_FIELDS,
       },
     })
-    books.value = (response.data.docs ?? []).map(mapSearchDocToBook)
+    books.value = await enrichBooksWithDescriptions(
+      (response.data.docs ?? []).map(mapSearchDocToBook),
+    )
   }
 
   const fetchSearchBooks = async (): Promise<void> => {
@@ -45,7 +48,9 @@ export const useBookStore = defineStore('book', () => {
         fields: OPEN_LIBRARY_SEARCH_FIELDS,
       },
     })
-    searchBooks.value = (response.data.docs ?? []).map(mapSearchDocToBook)
+    searchBooks.value = await enrichBooksWithDescriptions(
+      (response.data.docs ?? []).map(mapSearchDocToBook),
+    )
   }
 
   const fetchBookId = async (id: string): Promise<void> => {
@@ -65,6 +70,14 @@ export const useBookStore = defineStore('book', () => {
         .filter((name): name is string => Boolean(name))
 
       selectBook.value = mapWorkToBook(work, authorNames)
+
+      const cachedBook =
+        books.value.find((book) => book.id === id) ??
+        searchBooks.value.find((book) => book.id === id)
+
+      if (cachedBook?.volumeInfo.averageRating != null) {
+        selectBook.value.volumeInfo.averageRating = cachedBook.volumeInfo.averageRating
+      }
     } catch (e) {
       console.error('Ошибка загрузки книги:', e)
       if (isAxiosError(e)) {
