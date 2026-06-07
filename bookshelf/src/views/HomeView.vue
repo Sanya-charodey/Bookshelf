@@ -23,17 +23,6 @@ const store = useBookStore()
 const loading = ref(false)
 const error = ref<string | null>(null)
 
-onMounted(async () => {
-    loading.value = true
-    try {
-        await store.fetchBooks('subject:fantasy')
-    } catch {
-        error.value = 'Не удалось загрузить книги'
-    } finally {
-        loading.value = false
-    }
-})
-
 const loadBooks = async () => {
     loading.value = true
     error.value = null

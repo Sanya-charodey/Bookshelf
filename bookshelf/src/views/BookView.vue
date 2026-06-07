@@ -90,7 +90,6 @@ const statusOptions: StatusOption[] = [
     { value: 'finished', label: 'Прочитано', icon: IconFinished },
 ]
 
-const routeId = route.params.id
 const id = typeof route.params.id === 'string' ? route.params.id : ''
 
 const dropdownOpen = ref(false)
@@ -109,7 +108,7 @@ function handleClickOutside(e: MouseEvent) {
     if (!(e.target instanceof Node)) return
 
     const target = e.target as Element
-    if (!dropdownOpen.value || target.closest('book_status')) {
+    if (!dropdownOpen.value || target.closest('.book_status')) {
         return
     }
 

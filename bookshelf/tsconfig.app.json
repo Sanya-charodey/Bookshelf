@@ -3,6 +3,12 @@
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
+    // Explicit module settings so the IDE resolves import.meta (inherits from @vue/tsconfig, but
+    // the language service can miss extended options when using project references).
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+
     // Extra safety for array and object lookups, but may have false positives.
     "noUncheckedIndexedAccess": true,
 

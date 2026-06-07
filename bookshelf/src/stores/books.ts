@@ -75,7 +75,7 @@ export const useBookStore = defineStore('book', () => {
 
   const allGenres = computed(() => {
     const genres = books.value.flatMap((book) => book.volumeInfo.categories ?? [])
-    return [...new Set(genres)]
+    return Array.from(new Set(genres))
   })
 
   const selectGenre = (genre: string) => {
@@ -90,10 +90,6 @@ export const useBookStore = defineStore('book', () => {
     return books.value.filter((book) => book.volumeInfo.categories?.includes(selectedGenre.value!))
   })
 
-  const displayBooks = computed(() => {
-    return searchQuery.value.trim() ? searchBooks.value : books.value
-  })
-
   return {
     books,
     fetchBooks,
@@ -106,7 +102,6 @@ export const useBookStore = defineStore('book', () => {
     selectGenre,
     selectedGenre,
     filteredBooks,
-    displayBooks,
     isFetching,
     error,
   }
