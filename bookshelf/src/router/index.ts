@@ -15,17 +15,21 @@ const routes = [
   {
     path: '/shelf',
     name: 'Shelf',
+    meta: { requiresAuth: true },
     component: () => import('../views/ShelfView.vue'),
-    beforeEnter: () => {
-      const auth = useAuthStore()
-      if (!auth.isAuthenticated) return { name: 'Home' }
-    },
   },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach((to) => {
+  if (to.meta.requiresAuth) {
+    const auth = useAuthStore()
+    if (!auth.isAuthenticated) return { name: 'Home' }
+  }
 })
 
 export default router
