@@ -77,12 +77,14 @@ import { useBookInfo } from '@/composables/useBookInfo'
 import type { StatusValue, StatusOption } from '@/types/status'
 import { IconCalendar, IconFinished, IconPages, IconPlanned, IconReading, StatusArrow, IconStar } from '@/components/icons/'
 import { useStatusStore } from '@/stores/status'
+import { useShelfStore } from '@/stores/shelf'
 
 const store = useBookStore()
 const route = useRoute()
 const router = useRouter()
 const { thumbnail, authors, description, rating } = useBookInfo(() => store.selectBook)
 const statusStore = useStatusStore()
+const shelfStore = useShelfStore()
 
 const statusOptions: StatusOption[] = [
     { value: 'planned', label: 'Планирую прочесть', icon: IconPlanned },
@@ -117,11 +119,15 @@ function handleClickOutside(e: MouseEvent) {
 
 function selectStatus(value: StatusValue) {
     statusStore.setStatus(id, value)
+    if (store.selectBook) {
+        shelfStore.addBook(store.selectBook)
+    }
     dropdownOpen.value = false
 }
 
 function removeStatus() {
     statusStore.removeStatus(id)
+    shelfStore.removeBook(id)
     dropdownOpen.value = false
 }
 

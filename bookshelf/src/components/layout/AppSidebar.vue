@@ -2,7 +2,7 @@
     <aside class="sidebar">
 
         <div class="sidebar__wrap-btn">
-            <button v-if="authStore.isAuthenticated" class="sidebar__my-book">Мои книги</button>
+            <RouterLink v-if="authStore.isAuthenticated" to="/shelf" class="sidebar__my-book">Мои книги</RouterLink>
             <form class="sidebar__search" @submit.prevent>
                 <input class="sidebar__input" type="search" placeholder="Поиск" v-model="store.searchQuery"
                     @input="onSearch">
