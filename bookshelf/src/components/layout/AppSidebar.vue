@@ -2,7 +2,7 @@
     <aside class="sidebar">
 
         <div class="sidebar__wrap-btn">
-            <button class="sidebar__my-book">Мои книги</button>
+            <button v-if="authStore.isAuthenticated" class="sidebar__my-book">Мои книги</button>
             <form class="sidebar__search" @submit.prevent>
                 <input class="sidebar__input" type="search" placeholder="Поиск" v-model="store.searchQuery"
                     @input="onSearch">
@@ -25,8 +25,10 @@
 </template>
 
 <script setup lang='ts'>
+import { useAuthStore } from '@/stores/auth';
 import { useBookStore } from '@/stores/books';
 
+const authStore = useAuthStore()
 const store = useBookStore()
 
 let debounceTimer: ReturnType<typeof setTimeout>
