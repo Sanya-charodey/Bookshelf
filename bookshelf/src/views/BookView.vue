@@ -20,18 +20,29 @@
                     </button>
 
                     <div v-if="dropdownOpen" class="status-dropdown">
-                        <button v-for="option in statusOptions" :key="option.value" class="status-dropdown__item"
-                            :class="{ 'status-dropdown__item--active': selectedStatus === option.value }"
-                            @click="selectStatus(option.value)">
-                            <component :is="option.icon" class="status-dropdown__icon" />
-                            {{ option.label }}
-                            <span v-if="selectedStatus === option.value" class="status-dropdown__check">✓</span>
-                        </button>
+                        <template v-if="!authStore.isAuthenticated && !selectedStatus">
+                            <div class="status-dropdown__prompt">
+                                Войдите, чтобы добавлять книги на полку
+                            </div>
+                            <button class="status-dropdown__login" @click="authStore.login(); dropdownOpen = false">
+                                Войти
+                            </button>
+                        </template>
 
-                        <div v-if="selectedStatus" class="status-dropdown__divider"></div>
-                        <button v-if="selectedStatus" class="status-dropdown__remove" @click="removeStatus">
-                            Удалить из списка
-                        </button>
+                        <template v-else>
+                            <button v-for="option in statusOptions" :key="option.value" class="status-dropdown__item"
+                                :class="{ 'status-dropdown__item--active': selectedStatus === option.value }"
+                                @click="selectStatus(option.value)">
+                                <component :is="option.icon" class="status-dropdown__icon" />
+                                {{ option.label }}
+                                <span v-if="selectedStatus === option.value" class="status-dropdown__check">✓</span>
+                            </button>
+
+                            <div v-if="selectedStatus" class="status-dropdown__divider"></div>
+                            <button v-if="selectedStatus" class="status-dropdown__remove" @click="removeStatus">
+                                Удалить из списка
+                            </button>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -78,6 +89,7 @@ import type { StatusValue, StatusOption } from '@/types/status'
 import { IconCalendar, IconFinished, IconPages, IconPlanned, IconReading, StatusArrow, IconStar } from '@/components/icons/'
 import { useStatusStore } from '@/stores/status'
 import { useShelfStore } from '@/stores/shelf'
+import { useAuthStore } from '@/stores/auth'
 
 const store = useBookStore()
 const route = useRoute()
@@ -85,6 +97,7 @@ const router = useRouter()
 const { thumbnail, authors, description, rating } = useBookInfo(() => store.selectBook)
 const statusStore = useStatusStore()
 const shelfStore = useShelfStore()
+const authStore = useAuthStore()
 
 const statusOptions: StatusOption[] = [
     { value: 'planned', label: 'Планирую прочесть', icon: IconPlanned },
@@ -252,5 +265,27 @@ onUnmounted(() => {
 
 .book__link:hover {
     text-decoration: underline;
+}
+
+.status-dropdown__prompt {
+    padding: 12px 16px;
+    color: #666;
+    font-size: 13px;
+    text-align: center;
+}
+
+.status-dropdown__login {
+    width: 100%;
+    padding: 10px 16px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-dropdown__login:hover {
+    background: #1d4ed8;
 }
 </style>
