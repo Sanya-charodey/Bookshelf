@@ -89,17 +89,18 @@ export const useBookStore = defineStore('book', () => {
         .map((response) => response.data.name)
         .filter((name): name is string => Boolean(name))
 
-      selectBook.value = mapWorkToBook(work, authorNames)
+      const book = mapWorkToBook(work, authorNames)
 
       const existingBook =
         books.value.find((book) => book.id === id) ??
         searchBooks.value.find((book) => book.id === id)
 
       if (existingBook?.volumeInfo.averageRating != null) {
-        selectBook.value.volumeInfo.averageRating = existingBook.volumeInfo.averageRating
+        book.volumeInfo = { ...book.volumeInfo, averageRating: existingBook.volumeInfo.averageRating }
       }
 
-      bookDetailCache.set(id, selectBook.value)
+      selectBook.value = book
+      bookDetailCache.set(id, book)
     } catch (e) {
       if (axios.isCancel(e)) return
 
