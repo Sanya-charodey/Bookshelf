@@ -33,15 +33,21 @@ export const useBookStore = defineStore('book', () => {
   }
 
   async function executeSearch(query: string, target: Ref<Book[]>) {
+    const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
+      params: { q: query, limit: 40, fields: OPEN_LIBRARY_SEARCH_FIELDS },
+    })
+    target.value = await enrichBooksWithDescriptions(
+      (response.data.docs ?? []).map(mapSearchDocToBook),
+    )
+    searchCache.set(query, target.value)
+  }
+
+  const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
+    if (loadCached(searchCache.get(query), data => { books.value = data })) return
+    isFetching.value = true
+    error.value = null
     try {
-      const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
-        params: { q: query, limit: 40, fields: OPEN_LIBRARY_SEARCH_FIELDS },
-      })
-      target.value = await enrichBooksWithDescriptions(
-        (response.data.docs ?? []).map(mapSearchDocToBook),
-      )
-      searchCache.set(query, target.value)
-      error.value = null
+      await executeSearch(query, books)
     } catch (e) {
       console.error('Ошибка поиска:', e)
       if (isAxiosError(e)) {
@@ -51,22 +57,33 @@ export const useBookStore = defineStore('book', () => {
       } else {
         error.value = 'Неизвестная ошибка'
       }
+    } finally {
+      isFetching.value = false
     }
   }
 
-  const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
-    if (loadCached(searchCache.get(query), data => { books.value = data })) return
-    isFetching.value = true
-    error.value = null
-    await executeSearch(query, books)
-    isFetching.value = false
-  }
-
   const fetchSearchBooks = async (): Promise<void> => {
-    if (!searchQuery.value.trim()) return
-    if (loadCached(searchCache.get(searchQuery.value), data => { searchBooks.value = data })) return
+  if (!searchQuery.value.trim()) return
+  if (loadCached(searchCache.get(searchQuery.value), data => { searchBooks.value = data })) return
+  
+  isFetching.value = true  
+  error.value = null     
+  
+  try {
     await executeSearch(searchQuery.value, searchBooks)
+  } catch (e) {
+    console.error('Ошибка поиска:', e)
+    if (isAxiosError(e)) {
+      error.value = e.response?.status === 503
+        ? 'Упс, что-то пошло не так. Попробуйте снова.'
+        : 'Ошибка соединения с сервером.'
+    } else {
+      error.value = 'Неизвестная ошибка'
+    }
+  } finally {
+    isFetching.value = false  
   }
+}
 
   let bookAbortController: AbortController | null = null
 
@@ -115,7 +132,7 @@ export const useBookStore = defineStore('book', () => {
           error.value = 'Ошибка соединения с сервером.'
         }
       } else {
-        error.value = 'Неизвестная'
+        error.value = 'Неизвестная ошибка'
       }
     } finally {
       isFetching.value = false

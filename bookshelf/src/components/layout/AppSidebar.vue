@@ -40,8 +40,8 @@ let debounceTimer: ReturnType<typeof setTimeout>
 
 const onSearch = () => {
     clearTimeout(debounceTimer)
-    debounceTimer = setTimeout(() => {
-        store.fetchSearchBooks()
+    debounceTimer = setTimeout(async () => {
+        await store.fetchSearchBooks()
     }, 500)
 }
 </script>
