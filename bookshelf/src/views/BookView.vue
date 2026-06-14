@@ -64,9 +64,15 @@
                 </div>
 
                 <div class="book__categories" v-if="store.selectBook.volumeInfo.categories?.length">
-                    <span class="book__category" v-for="cat in store.selectBook.volumeInfo.categories" :key="cat">
+                    <RouterLink 
+                        class="book__category" 
+                        v-for="cat in store.selectBook.volumeInfo.categories" 
+                        :key="cat"
+                        :to="{ name: 'Home' }" 
+                        @click="store.selectGenre(cat)"
+                    >
                         {{ cat }}
-                    </span>
+                    </RouterLink>
                 </div>
 
                 <p class="book__description">{{ description }}</p>
@@ -123,7 +129,7 @@ function handleClickOutside(e: MouseEvent) {
     if (!(e.target instanceof Node)) return
 
     const target = e.target as Element
-    if (!dropdownOpen.value || target.closest('.book_status')) {
+    if (!dropdownOpen.value || target.closest('.book__status')) {
         return
     }
 

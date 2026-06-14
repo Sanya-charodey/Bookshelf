@@ -12,14 +12,19 @@
         <span class="sidebar__text">Жанры:</span>
 
         <nav class="sidebar__nav" aria-label="Навигация по жанрам">
-            <ul class="sidebar__list">
-                <li class="sidebar__item" v-for="genre in store.allGenres" :key="genre"
-                    :class="{ 'sidebar__item--active': store.selectedGenre === genre }"
-                    @click="store.selectGenre(genre)">
-                    {{ genre }}
-                </li>
-            </ul>
-        </nav>
+    <ul class="sidebar__list">
+        <li class="sidebar__item" v-for="genre in store.allGenres" :key="genre">
+            <RouterLink
+                :to="{ name: 'Home' }"
+                class="sidebar__genre-link"
+                :class="{ 'sidebar__item--active': store.selectedGenre === genre }"
+                @click="store.selectGenre(genre)"
+            >
+                {{ genre }}
+            </RouterLink>
+        </li>
+    </ul>
+</nav>
 
     </aside>
 </template>
