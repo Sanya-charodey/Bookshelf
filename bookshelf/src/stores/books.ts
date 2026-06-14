@@ -33,13 +33,25 @@ export const useBookStore = defineStore('book', () => {
   }
 
   async function executeSearch(query: string, target: Ref<Book[]>) {
-    const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
-      params: { q: query, limit: 40, fields: OPEN_LIBRARY_SEARCH_FIELDS },
-    })
-    target.value = await enrichBooksWithDescriptions(
-      (response.data.docs ?? []).map(mapSearchDocToBook),
-    )
-    searchCache.set(query, target.value)
+    try {
+      const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
+        params: { q: query, limit: 40, fields: OPEN_LIBRARY_SEARCH_FIELDS },
+      })
+      target.value = await enrichBooksWithDescriptions(
+        (response.data.docs ?? []).map(mapSearchDocToBook),
+      )
+      searchCache.set(query, target.value)
+      error.value = null
+    } catch (e) {
+      console.error('Ошибка поиска:', e)
+      if (isAxiosError(e)) {
+        error.value = e.response?.status === 503
+          ? 'Упс, что-то пошло не так. Попробуйте снова.'
+          : 'Ошибка соединения с сервером.'
+      } else {
+        error.value = 'Неизвестная ошибка'
+      }
+    }
   }
 
   const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
