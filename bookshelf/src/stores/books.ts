@@ -65,19 +65,25 @@ export const useBookStore = defineStore('book', () => {
     await executeSearch(searchQuery.value, searchBooks)
   }
 
+  let bookAbortController: AbortController | null = null
+
   const fetchBookId = async (id: string): Promise<void> => {
     if (loadCached(bookDetailCache.get(id), data => { selectBook.value = data })) return
+
+    bookAbortController?.abort()
+    bookAbortController = new AbortController()
+    const { signal } = bookAbortController
 
     isFetching.value = true
     error.value = null
 
     try {
-      const workResponse = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${id}.json`)
+      const workResponse = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${id}.json`, { signal })
       const work = workResponse.data
 
       const authorKeys = work.authors?.map((entry) => entry.author.key) ?? []
       const authorResponses = await Promise.all(
-        authorKeys.map((key) => axios.get<OpenLibraryAuthor>(`${BASE_URL}${key}.json`)),
+        authorKeys.map((key) => axios.get<OpenLibraryAuthor>(`${BASE_URL}${key}.json`, { signal })),
       )
       const authorNames = authorResponses
         .map((response) => response.data.name)
@@ -95,6 +101,8 @@ export const useBookStore = defineStore('book', () => {
 
       bookDetailCache.set(id, selectBook.value)
     } catch (e) {
+      if (axios.isCancel(e)) return
+
       console.error('Ошибка загрузки книги:', e)
       if (isAxiosError(e)) {
         if (e.response?.status === 503) {
