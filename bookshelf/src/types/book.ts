@@ -4,7 +4,7 @@ export interface Book {
 }
 
 export interface volumeInfo {
-  averageRating: any
+  averageRating?: number
   title: string
   authors: string[] | null
   description: string
