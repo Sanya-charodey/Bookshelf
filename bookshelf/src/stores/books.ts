@@ -33,45 +33,75 @@ export const useBookStore = defineStore('book', () => {
   }
 
   async function executeSearch(query: string, target: Ref<Book[]>) {
-    try {
-      const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
-        params: { q: query, limit: 40, fields: OPEN_LIBRARY_SEARCH_FIELDS },
-      })
-      target.value = await enrichBooksWithDescriptions(
-        (response.data.docs ?? []).map(mapSearchDocToBook),
-      )
-      searchCache.set(query, target.value)
-      error.value = null
-    } catch (e) {
-      console.error('Ошибка поиска:', e)
-      if (isAxiosError(e)) {
-        error.value = e.response?.status === 503
+    const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
+      params: { q: query, limit: 40, fields: OPEN_LIBRARY_SEARCH_FIELDS },
+    })
+    target.value = await enrichBooksWithDescriptions(
+      (response.data.docs ?? []).map(mapSearchDocToBook),
+    )
+    searchCache.set(query, target.value)
+  }
+
+  function handleError(context: string, e: unknown) {
+    console.error(`${context}:`, e)
+    if (isAxiosError(e)) {
+      error.value =
+        e.response?.status === 503
           ? 'Упс, что-то пошло не так. Попробуйте снова.'
           : 'Ошибка соединения с сервером.'
-      } else {
-        error.value = 'Неизвестная ошибка'
-      }
+    } else {
+      error.value = 'Неизвестная ошибка'
     }
   }
 
   const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
-    if (loadCached(searchCache.get(query), data => { books.value = data })) return
+    if (
+      loadCached(searchCache.get(query), (data) => {
+        books.value = data
+      })
+    )
+      return
     isFetching.value = true
     error.value = null
-    await executeSearch(query, books)
-    isFetching.value = false
+    try {
+      await executeSearch(query, books)
+    } catch (e) {
+      handleError('Ошибка поиска', e)
+    } finally {
+      isFetching.value = false
+    }
   }
 
   const fetchSearchBooks = async (): Promise<void> => {
     if (!searchQuery.value.trim()) return
-    if (loadCached(searchCache.get(searchQuery.value), data => { searchBooks.value = data })) return
-    await executeSearch(searchQuery.value, searchBooks)
+    if (
+      loadCached(searchCache.get(searchQuery.value), (data) => {
+        searchBooks.value = data
+      })
+    )
+      return
+
+    isFetching.value = true
+    error.value = null
+
+    try {
+      await executeSearch(searchQuery.value, searchBooks)
+    } catch (e) {
+      handleError('Ошибка поиска', e)
+    } finally {
+      isFetching.value = false
+    }
   }
 
   let bookAbortController: AbortController | null = null
 
   const fetchBookId = async (id: string): Promise<void> => {
-    if (loadCached(bookDetailCache.get(id), data => { selectBook.value = data })) return
+    if (
+      loadCached(bookDetailCache.get(id), (data) => {
+        selectBook.value = data
+      })
+    )
+      return
 
     bookAbortController?.abort()
     bookAbortController = new AbortController()
@@ -81,7 +111,9 @@ export const useBookStore = defineStore('book', () => {
     error.value = null
 
     try {
-      const workResponse = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${id}.json`, { signal })
+      const workResponse = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${id}.json`, {
+        signal,
+      })
       const work = workResponse.data
 
       const authorKeys = work.authors?.map((entry) => entry.author.key) ?? []
@@ -99,7 +131,10 @@ export const useBookStore = defineStore('book', () => {
         searchBooks.value.find((book) => book.id === id)
 
       if (existingBook?.volumeInfo.averageRating != null) {
-        book.volumeInfo = { ...book.volumeInfo, averageRating: existingBook.volumeInfo.averageRating }
+        book.volumeInfo = {
+          ...book.volumeInfo,
+          averageRating: existingBook.volumeInfo.averageRating,
+        }
       }
 
       selectBook.value = book
@@ -107,16 +142,7 @@ export const useBookStore = defineStore('book', () => {
     } catch (e) {
       if (axios.isCancel(e)) return
 
-      console.error('Ошибка загрузки книги:', e)
-      if (isAxiosError(e)) {
-        if (e.response?.status === 503) {
-          error.value = 'Упс, что-то пошло не так. Попробуйте снова.'
-        } else {
-          error.value = 'Ошибка соединения с сервером.'
-        }
-      } else {
-        error.value = 'Неизвестная'
-      }
+      handleError('Ошибка загрузки книги', e)
     } finally {
       isFetching.value = false
     }
