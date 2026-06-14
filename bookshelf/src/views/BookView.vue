@@ -68,7 +68,7 @@
                         class="book__category" 
                         v-for="cat in store.selectBook.volumeInfo.categories" 
                         :key="cat"
-                        :to="{ name: 'Home' }" 
+                        :to="{ name: 'Home', query: { genre: cat } }" 
                         @click="store.selectGenre(cat)"
                     >
                         {{ cat }}
