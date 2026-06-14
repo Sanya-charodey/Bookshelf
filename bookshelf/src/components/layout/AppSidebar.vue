@@ -15,7 +15,7 @@
     <ul class="sidebar__list">
         <li class="sidebar__item" v-for="genre in store.allGenres" :key="genre">
             <RouterLink
-                :to="{ name: 'Home' }"
+                :to="store.selectedGenre === genre ? { name: 'Home' } : { name: 'Home', query: { genre } }"
                 class="sidebar__genre-link"
                 :class="{ 'sidebar__item--active': store.selectedGenre === genre }"
                 @click="store.selectGenre(genre)"

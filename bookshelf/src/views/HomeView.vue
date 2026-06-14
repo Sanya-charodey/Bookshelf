@@ -17,9 +17,15 @@
 <script setup lang='ts'>
 import { useBookStore } from '@/stores/books';
 import BookCard from '@/components/book/BookCard.vue';
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 const store = useBookStore()
+const route = useRoute()
+
+watch(() => route.query.genre, (genre) => {
+    store.selectedGenre = typeof genre === 'string' ? genre : null
+}, { immediate: true })
 
 onMounted(() => store.fetchBooks())
 </script>
