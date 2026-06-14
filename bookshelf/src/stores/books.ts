@@ -56,7 +56,10 @@ export const useBookStore = defineStore('book', () => {
 
   const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
     if (loadCached(searchCache.get(query), data => { books.value = data })) return
+    isFetching.value = true
+    error.value = null
     await executeSearch(query, books)
+    isFetching.value = false
   }
 
   const fetchSearchBooks = async (): Promise<void> => {

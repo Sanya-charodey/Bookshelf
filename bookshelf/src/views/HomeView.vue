@@ -2,10 +2,10 @@
     <main>
         <h1 class="title">Каталог книг</h1>
 
-        <div v-if="loading">Загрузка...</div>
-        <div v-else-if="error">
-            {{ error }}
-            <button @click="loadBooks">Попробовать снова</button>
+        <div v-if="store.isFetching">Загрузка...</div>
+        <div v-else-if="store.error">
+            {{ store.error }}
+            <button @click="store.fetchBooks()">Попробовать снова</button>
         </div>
 
         <div class="books" v-else>
@@ -17,25 +17,11 @@
 <script setup lang='ts'>
 import { useBookStore } from '@/stores/books';
 import BookCard from '@/components/book/BookCard.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 
 const store = useBookStore()
-const loading = ref(false)
-const error = ref<string | null>(null)
 
-const loadBooks = async () => {
-    loading.value = true
-    error.value = null
-    try {
-        await store.fetchBooks()
-    } catch {
-        error.value = 'Не удалось загрузить книги'
-    } finally {
-        loading.value = false
-    }
-}
-
-onMounted(loadBooks)
+onMounted(() => store.fetchBooks())
 </script>
 
 <style scoped>
