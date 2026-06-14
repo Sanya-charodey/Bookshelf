@@ -102,30 +102,39 @@ export function mapWorkToBook(work: OpenLibraryWork, authorNames: string[]): Boo
 }
 
 export async function enrichBooksWithDescriptions(bookList: Book[]): Promise<Book[]> {
-  return Promise.all(
-    bookList.map(async (book) => {
-      if (book.volumeInfo.description.trim()) return book
+  const CONCURRENCY = 5
+  const results: Book[] = []
 
-      const cached = descriptionCache.get(book.id)
-      if (cached !== undefined) {
-        if (!cached) return book
-        return { ...book, volumeInfo: { ...book.volumeInfo, description: cached } }
-      }
+  for (let i = 0; i < bookList.length; i += CONCURRENCY) {
+    const chunk = bookList.slice(i, i + CONCURRENCY)
+    const chunkResults = await Promise.all(
+      chunk.map(async (book) => {
+        if (book.volumeInfo.description.trim()) return book
 
-      try {
-        const { data } = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${book.id}.json`)
-        const description = parseTextField(data.description)
-        descriptionCache.set(book.id, description)
-        if (!description) return book
-
-        return {
-          ...book,
-          volumeInfo: { ...book.volumeInfo, description },
+        const cached = descriptionCache.get(book.id)
+        if (cached !== undefined) {
+          if (!cached) return book
+          return { ...book, volumeInfo: { ...book.volumeInfo, description: cached } }
         }
-      } catch {
-        descriptionCache.set(book.id, '')
-        return book
-      }
-    }),
-  )
+
+        try {
+          const { data } = await axios.get<OpenLibraryWork>(`${BASE_URL}/works/${book.id}.json`)
+          const description = parseTextField(data.description)
+          descriptionCache.set(book.id, description)
+          if (!description) return book
+
+          return {
+            ...book,
+            volumeInfo: { ...book.volumeInfo, description },
+          }
+        } catch {
+          descriptionCache.set(book.id, '')
+          return book
+        }
+      }),
+    )
+    results.push(...chunkResults)
+  }
+
+  return results
 }
