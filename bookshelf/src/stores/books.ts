@@ -15,27 +15,22 @@ import {
 import { searchCache, bookDetailCache } from '@/api/bookCache'
 
 export const PAGE_SIZE = 10
+export const DEFAULT_QUERY = 'subject:fantasy'
 
 export const useBookStore = defineStore('book', () => {
   const books = ref<Book[]>([])
   const searchBooks = ref<Book[]>([])
   const searchQuery = ref('')
   const selectBook = ref<Book | null>(null)
-  const selectedGenre = ref<string | null>(null)
   const isFetching = ref(false)
   const error = ref<string | null>(null)
 
   const currentPage = ref(1)
   const totalItems = ref(0)
-  const totalPages = computed(() => {
-    if (selectedGenre.value) {
-      return Math.max(1, Math.ceil(filteredBooks.value.length / PAGE_SIZE))
-    }
-    return Math.max(1, Math.ceil(totalItems.value / PAGE_SIZE))
-  })
+  const currentQuery = ref(DEFAULT_QUERY)
+  const totalPages = computed(() => Math.max(1, Math.ceil(totalItems.value / PAGE_SIZE)))
 
   const BASE_URL = 'https://openlibrary.org'
-  const DEFAULT_QUERY = 'subject:fantasy'
 
   function cacheKey(query: string, page: number) {
     return `${query}_page${page}`
@@ -63,8 +58,11 @@ export const useBookStore = defineStore('book', () => {
     }
   }
 
-  const fetchBooks = async (query: string = DEFAULT_QUERY, page: number = 1): Promise<void> => {
-    const cached = searchCache.get(cacheKey(query, page))
+  const fetchBooks = async (query?: string, page: number = 1): Promise<void> => {
+    const q = query ?? currentQuery.value
+    currentQuery.value = q
+
+    const cached = searchCache.get(cacheKey(q, page))
     if (cached) {
       books.value = cached.items
       totalItems.value = cached.total
@@ -75,12 +73,18 @@ export const useBookStore = defineStore('book', () => {
     error.value = null
     try {
       currentPage.value = page
-      await executeSearch(query, books, page)
+      await executeSearch(q, books, page)
     } catch (e) {
       handleError('Ошибка поиска', e)
     } finally {
       isFetching.value = false
     }
+  }
+
+  function setQuery(query: string) {
+    currentQuery.value = query || DEFAULT_QUERY
+    currentPage.value = 1
+    fetchBooks(currentQuery.value)
   }
 
   const fetchSearchBooks = async (page: number = 1): Promise<void> => {
@@ -168,53 +172,27 @@ export const useBookStore = defineStore('book', () => {
   function setPage(page: number) {
     if (page < 1 || page > totalPages.value) return
     currentPage.value = page
-    if (selectedGenre.value) return
     if (searchQuery.value.trim()) {
       fetchSearchBooks(page)
     } else {
-      fetchBooks(DEFAULT_QUERY, page)
+      fetchBooks(undefined, page)
     }
   }
-
-  const allGenres = computed(() => {
-    const genres = books.value.flatMap((book) => book.volumeInfo.categories ?? [])
-    return Array.from(new Set(genres))
-  })
-
-  const selectGenre = (genre: string) => {
-    selectedGenre.value = selectedGenre.value === genre ? null : genre
-    currentPage.value = 1
-  }
-
-  const filteredBooks = computed(() => {
-    if (searchQuery.value.trim()) return searchBooks.value
-
-    if (!selectedGenre.value) return books.value
-
-    return books.value.filter((book) => book.volumeInfo.categories?.includes(selectedGenre.value!))
-  })
 
   const displayBooks = computed(() => {
-    const filtered = filteredBooks.value
-    if (selectedGenre.value) {
-      const start = (currentPage.value - 1) * PAGE_SIZE
-      return filtered.slice(start, start + PAGE_SIZE)
-    }
-    return filtered
+    if (searchQuery.value.trim()) return searchBooks.value
+    return books.value
   })
 
   return {
     books,
     fetchBooks,
+    setQuery,
     fetchSearchBooks,
     searchBooks,
     fetchBookId,
     selectBook,
     searchQuery,
-    allGenres,
-    selectGenre,
-    selectedGenre,
-    filteredBooks,
     displayBooks,
     isFetching,
     error,

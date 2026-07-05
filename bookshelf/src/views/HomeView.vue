@@ -23,18 +23,17 @@
 
 <script setup lang='ts'>
 import { useBookStore } from '@/stores/books';
+import { useGenreStore } from '@/stores/genres';
 import BookCard from '@/components/book/BookCard.vue';
 import Pagination from '@/components/pagination/Pagination.vue';
 import { onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
 
 const store = useBookStore()
-const route = useRoute()
+const genreStore = useGenreStore()
 
-watch(() => route.query.genre, (genre) => {
-    store.selectedGenre = typeof genre === 'string' ? genre : null
-    store.setPage(1)
-}, { immediate: true })
+watch(() => genreStore.subjectQuery, (query) => {
+    store.setQuery(query)
+})
 
 onMounted(() => store.fetchBooks())
 </script>

@@ -68,8 +68,8 @@
                         class="book__category" 
                         v-for="cat in store.selectBook.volumeInfo.categories" 
                         :key="cat"
-                        :to="{ name: 'Home', query: { genre: cat } }" 
-                        @click="store.selectGenre(cat)"
+                        :to="{ name: 'Home' }" 
+                        @click="goToCategory(cat)"
                     >
                         {{ cat }}
                     </RouterLink>
@@ -90,6 +90,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBookStore } from '@/stores/books'
+import { useGenreStore } from '@/stores/genres'
 import { useBookInfo } from '@/composables/useBookInfo'
 import type { StatusValue, StatusOption } from '@/types/status'
 import { IconCalendar, IconFinished, IconPages, IconPlanned, IconReading, StatusArrow, IconStar } from '@/components/icons/'
@@ -98,6 +99,7 @@ import { useShelfStore } from '@/stores/shelf'
 import { useAuthStore } from '@/stores/auth'
 
 const store = useBookStore()
+const genreStore = useGenreStore()
 const route = useRoute()
 const router = useRouter()
 const { thumbnail, authors, description, rating } = useBookInfo(() => store.selectBook)
@@ -120,6 +122,12 @@ const selectedStatus = computed(() => statusStore.getStatus(id))
 const statusLabel = computed(() =>
     statusOptions.find(o => o.value === selectedStatus.value)?.label ?? ''
 )
+
+function goToCategory(cat: string) {
+    genreStore.clear()
+    store.setQuery(`subject:${cat}`)
+    router.push({ name: 'Home' })
+}
 
 function toggleDropdown() {
     dropdownOpen.value = !dropdownOpen.value
