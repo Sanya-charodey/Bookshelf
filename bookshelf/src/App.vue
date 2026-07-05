@@ -21,7 +21,7 @@ import AppSidebar from './components/layout/AppSidebar.vue';
 
 <style scoped>
 .app {
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     padding: 0 30px;
