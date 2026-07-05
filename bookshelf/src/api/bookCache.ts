@@ -54,6 +54,6 @@ export function createCache<T>(name: string, ttl: number = DEFAULT_TTL) {
   return { get, set }
 }
 
-export const searchCache = createCache<Book[]>('search')
+export const searchCache = createCache<{ items: Book[]; total: number }>('search')
 export const bookDetailCache = createCache<Book>('bookDetail')
 export const descriptionCache = createCache<string>('description')
