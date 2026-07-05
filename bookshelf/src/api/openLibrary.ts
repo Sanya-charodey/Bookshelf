@@ -21,6 +21,7 @@ export interface OpenLibrarySearchDoc {
 }
 
 export interface OpenLibrarySearchResponse {
+  numFound?: number
   docs: OpenLibrarySearchDoc[]
 }
 

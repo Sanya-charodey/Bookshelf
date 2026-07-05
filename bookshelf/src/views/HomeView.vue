@@ -9,14 +9,22 @@
         </div>
 
         <div class="books" v-else>
-            <BookCard v-for="book in store.filteredBooks" :key="book.id" :book="book" />
+            <BookCard v-for="book in store.displayBooks" :key="book.id" :book="book" />
         </div>
+
+        <Pagination
+            v-if="!store.isFetching && store.totalPages > 1"
+            :current-page="store.currentPage"
+            :total-pages="store.totalPages"
+            @page-change="store.setPage"
+        />
     </main>
 </template>
 
 <script setup lang='ts'>
 import { useBookStore } from '@/stores/books';
 import BookCard from '@/components/book/BookCard.vue';
+import Pagination from '@/components/pagination/Pagination.vue';
 import { onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -25,6 +33,7 @@ const route = useRoute()
 
 watch(() => route.query.genre, (genre) => {
     store.selectedGenre = typeof genre === 'string' ? genre : null
+    store.setPage(1)
 }, { immediate: true })
 
 onMounted(() => store.fetchBooks())

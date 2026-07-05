@@ -14,6 +14,8 @@ import {
 } from '@/api/openLibrary'
 import { searchCache, bookDetailCache } from '@/api/bookCache'
 
+export const PAGE_SIZE = 10
+
 export const useBookStore = defineStore('book', () => {
   const books = ref<Book[]>([])
   const searchBooks = ref<Book[]>([])
@@ -23,23 +25,30 @@ export const useBookStore = defineStore('book', () => {
   const isFetching = ref(false)
   const error = ref<string | null>(null)
 
+  const currentPage = ref(1)
+  const totalItems = ref(0)
+  const totalPages = computed(() => {
+    if (selectedGenre.value) {
+      return Math.max(1, Math.ceil(filteredBooks.value.length / PAGE_SIZE))
+    }
+    return Math.max(1, Math.ceil(totalItems.value / PAGE_SIZE))
+  })
+
   const BASE_URL = 'https://openlibrary.org'
   const DEFAULT_QUERY = 'subject:fantasy'
 
-  function loadCached<T>(data: T | undefined, assign: (data: T) => void) {
-    if (data === undefined) return false
-    assign(data)
-    return true
+  function cacheKey(query: string, page: number) {
+    return `${query}_page${page}`
   }
 
-  async function executeSearch(query: string, target: Ref<Book[]>) {
+  async function executeSearch(query: string, target: Ref<Book[]>, page: number) {
     const response = await axios.get<OpenLibrarySearchResponse>(`${BASE_URL}/search.json`, {
-      params: { q: query, limit: 40, fields: OPEN_LIBRARY_SEARCH_FIELDS },
+      params: { q: query, limit: PAGE_SIZE, page, fields: OPEN_LIBRARY_SEARCH_FIELDS },
     })
-    target.value = await enrichBooksWithDescriptions(
-      (response.data.docs ?? []).map(mapSearchDocToBook),
-    )
-    searchCache.set(query, target.value)
+    const docs = response.data.docs ?? []
+    totalItems.value = response.data.numFound ?? 0
+    target.value = await enrichBooksWithDescriptions(docs.map(mapSearchDocToBook))
+    searchCache.set(cacheKey(query, page), { items: target.value, total: totalItems.value })
   }
 
   function handleError(context: string, e: unknown) {
@@ -54,17 +63,19 @@ export const useBookStore = defineStore('book', () => {
     }
   }
 
-  const fetchBooks = async (query: string = DEFAULT_QUERY): Promise<void> => {
-    if (
-      loadCached(searchCache.get(query), (data) => {
-        books.value = data
-      })
-    )
+  const fetchBooks = async (query: string = DEFAULT_QUERY, page: number = 1): Promise<void> => {
+    const cached = searchCache.get(cacheKey(query, page))
+    if (cached) {
+      books.value = cached.items
+      totalItems.value = cached.total
+      currentPage.value = page
       return
+    }
     isFetching.value = true
     error.value = null
     try {
-      await executeSearch(query, books)
+      currentPage.value = page
+      await executeSearch(query, books, page)
     } catch (e) {
       handleError('Ошибка поиска', e)
     } finally {
@@ -72,20 +83,27 @@ export const useBookStore = defineStore('book', () => {
     }
   }
 
-  const fetchSearchBooks = async (): Promise<void> => {
-    if (!searchQuery.value.trim()) return
-    if (
-      loadCached(searchCache.get(searchQuery.value), (data) => {
-        searchBooks.value = data
-      })
-    )
+  const fetchSearchBooks = async (page: number = 1): Promise<void> => {
+    if (!searchQuery.value.trim()) {
+      searchBooks.value = []
+      totalItems.value = 0
       return
+    }
+
+    const cached = searchCache.get(cacheKey(searchQuery.value, page))
+    if (cached) {
+      searchBooks.value = cached.items
+      totalItems.value = cached.total
+      currentPage.value = page
+      return
+    }
 
     isFetching.value = true
     error.value = null
 
     try {
-      await executeSearch(searchQuery.value, searchBooks)
+      currentPage.value = page
+      await executeSearch(searchQuery.value, searchBooks, page)
     } catch (e) {
       handleError('Ошибка поиска', e)
     } finally {
@@ -96,12 +114,11 @@ export const useBookStore = defineStore('book', () => {
   let bookAbortController: AbortController | null = null
 
   const fetchBookId = async (id: string): Promise<void> => {
-    if (
-      loadCached(bookDetailCache.get(id), (data) => {
-        selectBook.value = data
-      })
-    )
+    const cachedBook = bookDetailCache.get(id)
+    if (cachedBook !== undefined) {
+      selectBook.value = cachedBook
       return
+    }
 
     bookAbortController?.abort()
     bookAbortController = new AbortController()
@@ -148,6 +165,17 @@ export const useBookStore = defineStore('book', () => {
     }
   }
 
+  function setPage(page: number) {
+    if (page < 1 || page > totalPages.value) return
+    currentPage.value = page
+    if (selectedGenre.value) return
+    if (searchQuery.value.trim()) {
+      fetchSearchBooks(page)
+    } else {
+      fetchBooks(DEFAULT_QUERY, page)
+    }
+  }
+
   const allGenres = computed(() => {
     const genres = books.value.flatMap((book) => book.volumeInfo.categories ?? [])
     return Array.from(new Set(genres))
@@ -155,6 +183,7 @@ export const useBookStore = defineStore('book', () => {
 
   const selectGenre = (genre: string) => {
     selectedGenre.value = selectedGenre.value === genre ? null : genre
+    currentPage.value = 1
   }
 
   const filteredBooks = computed(() => {
@@ -163,6 +192,15 @@ export const useBookStore = defineStore('book', () => {
     if (!selectedGenre.value) return books.value
 
     return books.value.filter((book) => book.volumeInfo.categories?.includes(selectedGenre.value!))
+  })
+
+  const displayBooks = computed(() => {
+    const filtered = filteredBooks.value
+    if (selectedGenre.value) {
+      const start = (currentPage.value - 1) * PAGE_SIZE
+      return filtered.slice(start, start + PAGE_SIZE)
+    }
+    return filtered
   })
 
   return {
@@ -177,7 +215,12 @@ export const useBookStore = defineStore('book', () => {
     selectGenre,
     selectedGenre,
     filteredBooks,
+    displayBooks,
     isFetching,
     error,
+    currentPage,
+    totalItems,
+    totalPages,
+    setPage,
   }
 })
