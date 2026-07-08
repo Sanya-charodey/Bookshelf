@@ -2,15 +2,17 @@ import { defineStore } from 'pinia'
 import { computed, ref, type Ref } from 'vue'
 import axios from 'axios'
 import type { Book } from '@/types/book'
+import type {
+  OpenLibraryAuthor,
+  OpenLibrarySearchResponse,
+  OpenLibraryWork,
+} from '@/types/openLibrary'
 import { isAxiosError } from 'axios'
 import {
   enrichBooksWithDescriptions,
   mapSearchDocToBook,
   mapWorkToBook,
   OPEN_LIBRARY_SEARCH_FIELDS,
-  type OpenLibraryAuthor,
-  type OpenLibrarySearchResponse,
-  type OpenLibraryWork,
 } from '@/api/openLibrary'
 import { searchCache, bookDetailCache } from '@/api/bookCache'
 

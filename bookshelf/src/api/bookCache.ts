@@ -1,13 +1,8 @@
 import type { Book } from '@/types/book'
+import type { CacheEntry } from '@/types/cache'
 
 const CACHE_PREFIX = 'bookshelf_'
 const DEFAULT_TTL = 24 * 60 * 60 * 1000
-
-interface CacheEntry<T> {
-  data: T
-  timestamp: number
-  ttl: number
-}
 
 export function createCache<T>(name: string, ttl: number = DEFAULT_TTL) {
   const storageKey = CACHE_PREFIX + name
