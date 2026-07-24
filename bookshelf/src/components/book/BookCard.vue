@@ -11,7 +11,7 @@
             <p class="card__year">{{ year }}</p>
 
             <div class="card__rating" v-if="rating">
-                ⭐ {{ rating }}
+                <IconStar /> {{ rating }}
             </div>
 
             <p class="card__description">{{ shortDescription }}</p>
@@ -23,6 +23,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Book } from '@/types/book'
+import { IconStar } from '@/components/icons'
 import { useBookInfo } from '@/composables/useBookInfo'
 
 
