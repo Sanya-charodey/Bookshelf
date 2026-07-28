@@ -98,6 +98,34 @@ const onSearch = () => {
     accent-color: #4a90d9;
 }
 
+.sidebar__search {
+    display: flex;
+}
+
+.sidebar__input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    font-size: $font-size-btn;
+    color: $color-text-primary;
+    background: $color-white;
+    outline: none;
+    transition: border-color $transition-fast;
+
+    &::placeholder {
+        color: $color-placeholder;
+    }
+
+    &:focus {
+        border-color: $color-primary;
+    }
+
+    &::-webkit-search-cancel-button {
+        cursor: pointer;
+    }
+}
+
 .sidebar__my-book {
     display: block;
     padding: 8px 16px;
