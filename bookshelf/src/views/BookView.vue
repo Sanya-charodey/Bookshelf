@@ -168,28 +168,31 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+@use '@/assets/styles/mixins' as *;
+
 .book-view {
-    padding: 24px 32px;
+    padding: $spacing-lg 32px;
 }
 
 .back-btn {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 24px;
+    font-size: $font-size-btn;
+    color: $color-text-muted;
+    margin-bottom: $spacing-lg;
     padding: 0;
 }
 
 .back-btn:hover {
-    color: #000;
+    color: $color-black;
 }
 
 .state {
     text-align: center;
-    color: #999;
+    color: $color-text-light;
     margin-top: 60px;
 }
 
@@ -202,12 +205,10 @@ onUnmounted(() => {
     flex-shrink: 0;
     width: 200px;
     height: 300px;
-    border-radius: 8px;
+    border-radius: $radius-sm;
     overflow: hidden;
-    background: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: $color-cover-bg;
+    @include flex-center;
 }
 
 .book__img {
@@ -217,34 +218,34 @@ onUnmounted(() => {
 }
 
 .book__no-img {
-    color: #aaa;
-    font-size: 14px;
+    color: $color-placeholder;
+    font-size: $font-size-btn;
 }
 
 .book__info {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: $spacing-base;
 }
 
 .book__title {
-    font-size: 24px;
+    font-size: $font-size-xl;
     font-weight: 700;
     margin: 0;
     line-height: 1.3;
 }
 
 .book__authors {
-    font-size: 15px;
-    color: #666;
+    font-size: $font-size-md;
+    color: $color-text-muted;
     margin: 0;
 }
 
 .book__meta {
     display: flex;
-    gap: 16px;
-    font-size: 14px;
-    color: #555;
+    gap: $spacing-md;
+    font-size: $font-size-btn;
+    color: $color-text-secondary;
 }
 
 .book__categories {
@@ -254,17 +255,17 @@ onUnmounted(() => {
 }
 
 .book__category {
-    background: #f0f0f0;
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 13px;
-    color: #444;
+    background: $color-cover-bg;
+    border-radius: $radius-lg;
+    padding: 4px $spacing-base;
+    font-size: $font-size-base;
+    color: $color-text-tertiary;
 }
 
 .book__description {
-    font-size: 15px;
+    font-size: $font-size-md;
     line-height: 1.7;
-    color: #333;
+    color: $color-text-primary;
     margin: 0;
     max-width: 600px;
 }
@@ -272,8 +273,8 @@ onUnmounted(() => {
 .book__link {
     display: inline-block;
     margin-top: 8px;
-    color: #2563eb;
-    font-size: 14px;
+    color: $color-link;
+    font-size: $font-size-btn;
     text-decoration: none;
 }
 
@@ -282,24 +283,24 @@ onUnmounted(() => {
 }
 
 .status-dropdown__prompt {
-    padding: 12px 16px;
-    color: #666;
-    font-size: 13px;
+    padding: $spacing-base $spacing-md;
+    color: $color-text-muted;
+    font-size: $font-size-base;
     text-align: center;
 }
 
 .status-dropdown__login {
     width: 100%;
-    padding: 10px 16px;
-    background: #2563eb;
-    color: #fff;
+    padding: 10px $spacing-md;
+    background: $color-link;
+    color: $color-white;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: $font-size-btn;
     font-weight: 500;
 }
 
 .status-dropdown__login:hover {
-    background: #1d4ed8;
+    background: $color-link-hover;
 }
 </style>
