@@ -66,10 +66,20 @@ const onSearch = () => {
     gap: 10px;
 }
 
+.sidebar__text {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: $color-text-light;
+    padding-top: $spacing-md;
+    border-top: 1px solid $color-border;
+}
+
 .sidebar__genres {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $spacing-sm;
     padding-bottom: 16px;
 }
 
@@ -77,25 +87,30 @@ const onSearch = () => {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 8px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
     cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    transition: background 0.15s;
+    font-size: $font-size-btn;
+    color: $color-text-primary;
+    background: $color-white;
+    transition: border-color $transition-fast, background $transition-fast;
 }
 
 .sidebar__genre:hover {
-    background: #f0f4ff;
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.04);
 }
 
 .sidebar__genre--checked {
-    color: #4a90d9;
+    border-color: $color-primary;
+    color: $color-primary;
     font-weight: 500;
+    background: rgba($color-primary, 0.06);
 }
 
 .sidebar__checkbox {
-    accent-color: #4a90d9;
+    accent-color: $color-primary;
 }
 
 .sidebar__search {
@@ -145,18 +160,20 @@ const onSearch = () => {
 }
 
 .sidebar__clear {
-    background: none;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    color: #666;
+    display: block;
+    padding: 8px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    font-size: $font-size-btn;
+    color: $color-text-muted;
+    background: $color-white;
     cursor: pointer;
-    transition: all 0.15s;
-}
+    transition: border-color $transition-fast, background $transition-fast, color $transition-fast;
 
-.sidebar__clear:hover {
-    border-color: #999;
-    color: #333;
+    &:hover {
+        border-color: $color-primary;
+        color: $color-primary;
+        background: rgba($color-primary, 0.04);
+    }
 }
 </style>
