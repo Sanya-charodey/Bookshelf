@@ -73,31 +73,32 @@ function goTo(page: number) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+@use '@/assets/styles/mixins' as *;
+
 .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 24px 0;
+    @include flex-center;
+    gap: $spacing-sm;
+    padding: $spacing-lg 0;
     flex-wrap: wrap;
 }
 
 .pagination__btn {
     min-width: 40px;
     padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #fff;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    background: $color-white;
     cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    transition: all 0.2s;
+    font-size: $font-size-btn;
+    color: $color-text-primary;
+    transition: all $transition-fast;
 }
 
 .pagination__btn:hover:not(:disabled) {
-    border-color: #4a90d9;
-    color: #4a90d9;
+    border-color: $color-primary;
+    color: $color-primary;
 }
 
 .pagination__btn:disabled {
@@ -106,13 +107,13 @@ function goTo(page: number) {
 }
 
 .pagination__btn--active {
-    background: #4a90d9;
-    color: #fff;
-    border-color: #4a90d9;
+    background: $color-primary;
+    color: $color-white;
+    border-color: $color-primary;
 }
 
 .pagination__ellipsis {
     padding: 8px 4px;
-    color: #999;
+    color: $color-text-light;
 }
 </style>
