@@ -27,7 +27,9 @@ import Applogo from '../icons/Applogo.vue';
 const auth = useAuthStore()
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+
 .wrap {
     display: flex;
     justify-content: space-between;
@@ -35,7 +37,7 @@ const auth = useAuthStore()
 
 .btn-wrap {
     display: flex;
-    gap: 20px;
+    gap: $spacing-xl;
 }
 
 .logo-link {
