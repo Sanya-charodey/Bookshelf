@@ -38,11 +38,13 @@ watch(() => genreStore.subjectQuery, (query) => {
 onMounted(() => store.fetchBooks())
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+
 .books {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 24px;
-    padding: 24px 0;
+    gap: $spacing-lg;
+    padding: $spacing-lg 0;
 }
 </style>
