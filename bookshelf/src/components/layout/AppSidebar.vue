@@ -57,7 +57,9 @@ const onSearch = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+
 .sidebar {
     display: flex;
     flex-direction: column;
@@ -94,6 +96,24 @@ const onSearch = () => {
 
 .sidebar__checkbox {
     accent-color: #4a90d9;
+}
+
+.sidebar__my-book {
+    display: block;
+    padding: 8px 16px;
+    border: 1px solid $color-primary;
+    border-radius: $radius-sm;
+    color: $color-primary;
+    font-size: $font-size-btn;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    background: transparent;
+    transition: all $transition-fast;
+
+    &:hover {
+        background: rgba($color-primary, 0.06);
+    }
 }
 
 .sidebar__clear {
