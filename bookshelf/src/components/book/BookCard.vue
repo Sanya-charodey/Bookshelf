@@ -42,29 +42,30 @@ const goToBook = () => {
 const shortDescription = computed(() => description.value.length > 120 ? description.value.slice(0, 120) + '...' : description.value)
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+@use '@/assets/styles/mixins' as *;
+
 .card {
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: $radius-md;
     overflow: hidden;
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: $color-white;
+    box-shadow: $shadow-card;
+    transition: transform $transition-fast, box-shadow $transition-fast;
     display: flex;
     flex-direction: column;
 }
 
 .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    box-shadow: $shadow-card-hover;
 }
 
 .card__cover {
     height: 200px;
-    background: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: $color-cover-bg;
+    @include flex-center;
 }
 
 .card__img {
@@ -74,49 +75,45 @@ const shortDescription = computed(() => description.value.length > 120 ? descrip
 }
 
 .card__no-img {
-    color: #aaa;
-    font-size: 14px;
+    color: $color-placeholder;
+    font-size: $font-size-base;
 }
 
 .card__info {
-    padding: 16px;
+    padding: $spacing-md;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: $spacing-sm;
     flex: 1;
 }
 
 .card__title {
-    font-size: 15px;
+    font-size: $font-size-md;
     font-weight: 600;
     line-height: 1.3;
     margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-clamp: 2;
+    @include text-clamp(2);
 }
 
 .card__authors {
-    font-size: 13px;
-    color: #666;
+    font-size: $font-size-base;
+    color: $color-text-muted;
     margin: 0;
 }
 
 .card__year {
-    font-size: 12px;
-    color: #999;
+    font-size: $font-size-sm;
+    color: $color-text-light;
     margin: 0;
 }
 
 .card__rating {
-    font-size: 13px;
+    font-size: $font-size-base;
 }
 
 .card__description {
-    font-size: 13px;
-    color: #555;
+    font-size: $font-size-base;
+    color: $color-text-secondary;
     line-height: 1.5;
     margin: 0;
 }
