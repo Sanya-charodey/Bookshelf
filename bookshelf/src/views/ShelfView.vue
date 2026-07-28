@@ -56,18 +56,20 @@ watch(() => shelfStore.books.length, () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+
 .books {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 24px;
-    padding: 24px 0;
+    gap: $spacing-lg;
+    padding: $spacing-lg 0;
 }
 
 .empty {
-    color: #999;
-    font-size: 16px;
-    padding: 48px 0;
+    color: $color-text-light;
+    font-size: $font-size-lg;
+    padding: $spacing-2xl 0;
     text-align: center;
 }
 </style>
