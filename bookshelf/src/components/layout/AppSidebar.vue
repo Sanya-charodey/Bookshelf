@@ -64,6 +64,7 @@ const onSearch = () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 0 $spacing-base;
 }
 
 .sidebar__text {
@@ -111,6 +112,12 @@ const onSearch = () => {
 
 .sidebar__checkbox {
     accent-color: $color-primary;
+}
+
+.sidebar__wrap-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .sidebar__search {
