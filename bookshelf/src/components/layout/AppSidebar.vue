@@ -57,58 +57,136 @@ const onSearch = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+
 .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    padding: 0 $spacing-base;
+}
+
+.sidebar__text {
+    display: block;
+    padding: 10px 0;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: $color-text-light;
 }
 
 .sidebar__genres {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $spacing-sm;
     padding-bottom: 16px;
 }
 
 .sidebar__genre {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 6px;
+    display: block;
+    padding: 8px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
     cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    transition: background 0.15s;
+    font-size: $font-size-btn;
+    color: $color-text-primary;
+    background: $color-white;
+    transition: border-color $transition-fast, background $transition-fast;
 }
 
 .sidebar__genre:hover {
-    background: #f0f4ff;
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.04);
 }
 
 .sidebar__genre--checked {
-    color: #4a90d9;
+    border-color: $color-primary;
+    color: $color-primary;
     font-weight: 500;
+    background: rgba($color-primary, 0.06);
 }
 
 .sidebar__checkbox {
-    accent-color: #4a90d9;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.sidebar__wrap-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $color-border;
+}
+
+.sidebar__search {
+    display: flex;
+}
+
+.sidebar__input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    font-size: $font-size-btn;
+    color: $color-text-primary;
+    background: $color-white;
+    outline: none;
+    transition: border-color $transition-fast;
+
+    &::placeholder {
+        color: $color-placeholder;
+    }
+
+    &:focus {
+        border-color: $color-primary;
+    }
+
+    &::-webkit-search-cancel-button {
+        cursor: pointer;
+    }
+}
+
+.sidebar__my-book {
+    display: block;
+    padding: 8px 16px;
+    border: 1px solid $color-primary;
+    border-radius: $radius-sm;
+    color: $color-primary;
+    font-size: $font-size-btn;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    background: transparent;
+    transition: all $transition-fast;
+
+    &:hover {
+        background: rgba($color-primary, 0.06);
+    }
 }
 
 .sidebar__clear {
-    background: none;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    color: #666;
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    font-size: $font-size-btn;
+    color: $color-text-muted;
+    background: $color-white;
     cursor: pointer;
-    transition: all 0.15s;
-}
+    transition: border-color $transition-fast, background $transition-fast, color $transition-fast;
 
-.sidebar__clear:hover {
-    border-color: #999;
-    color: #333;
+    &:hover {
+        border-color: $color-primary;
+        color: $color-primary;
+        background: rgba($color-primary, 0.04);
+    }
 }
 </style>
