@@ -61,20 +61,17 @@ const onSearch = () => {
 @use '@/assets/styles/variables' as *;
 
 .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     padding: 0 $spacing-base;
 }
 
 .sidebar__text {
+    display: block;
+    padding: 10px 0;
     font-size: $font-size-sm;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: $color-text-light;
-    padding-top: $spacing-md;
-    border-top: 1px solid $color-border;
 }
 
 .sidebar__genres {
@@ -124,6 +121,8 @@ const onSearch = () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $color-border;
 }
 
 .sidebar__search {
@@ -174,6 +173,7 @@ const onSearch = () => {
 
 .sidebar__clear {
     display: block;
+    width: 100%;
     padding: 8px 12px;
     border: 1px solid $color-border;
     border-radius: $radius-sm;
