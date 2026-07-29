@@ -36,7 +36,9 @@ const props = withDefaults(defineProps<{
 </script>
 
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
+
 .logo {
     display: flex;
     align-items: center;
@@ -47,7 +49,7 @@ const props = withDefaults(defineProps<{
 .logo-text {
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 1.3rem;
-    font-weight: 700;
+    font-weight: $font-weight-bold;
     color: var(--color-text-primary, #1a1a1a);
     letter-spacing: 0.02em;
     user-select: none;

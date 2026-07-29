@@ -173,7 +173,7 @@ onUnmounted(() => {
 @use '@/assets/styles/mixins' as *;
 
 .book-view {
-    padding: $spacing-lg 32px;
+    padding: $spacing-lg $spacing-3xl;
 }
 
 .back-btn {
@@ -239,7 +239,7 @@ onUnmounted(() => {
 
 .book__title {
     font-size: $font-size-xl;
-    font-weight: 700;
+    font-weight: $font-weight-bold;
     margin: 0;
     line-height: 1.3;
 }
@@ -260,7 +260,7 @@ onUnmounted(() => {
 .book__categories {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: $spacing-xs;
 }
 
 .book__category {
@@ -281,7 +281,7 @@ onUnmounted(() => {
 
 .book__link {
     display: inline-block;
-    margin-top: 8px;
+    margin-top: $spacing-xs;
     color: $color-link;
     font-size: $font-size-btn;
     text-decoration: none;
@@ -296,8 +296,8 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 8px $spacing-base;
+    gap: $spacing-xs;
+    padding: $spacing-xs $spacing-base;
     border: 1px solid $color-primary;
     border-radius: $radius-sm;
     font-size: $font-size-btn;
@@ -307,12 +307,12 @@ onUnmounted(() => {
     transition: background $transition-fast;
 
     &:hover {
-        background: rgba($color-primary, 0.06);
+        background: $hover-bg;
     }
 }
 
 .status-btn--active {
-    background: rgba($color-primary, 0.06);
+    background: $hover-bg;
 }
 
 .status-dropdown {
@@ -327,8 +327,8 @@ onUnmounted(() => {
 .status-dropdown__item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px $spacing-base;
+    gap: $spacing-xs;
+    padding: $spacing-xs $spacing-base;
     border: none;
     font-size: $font-size-btn;
     color: $color-text-primary;
@@ -343,7 +343,7 @@ onUnmounted(() => {
 
 .status-dropdown__item--active {
     color: $color-primary;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
 }
 
 .status-dropdown__icon {
@@ -364,7 +364,7 @@ onUnmounted(() => {
 .status-dropdown__remove {
     display: block;
     width: 100%;
-    padding: 8px $spacing-base;
+    padding: $spacing-xs $spacing-base;
     border: none;
     font-size: $font-size-btn;
     color: #e74c3c;
@@ -392,7 +392,7 @@ onUnmounted(() => {
     border: none;
     cursor: pointer;
     font-size: $font-size-btn;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
 }
 
 .status-dropdown__login:hover {

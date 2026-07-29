@@ -89,7 +89,7 @@ const shortDescription = computed(() => description.value.length > 120 ? descrip
 
 .card__title {
     font-size: $font-size-md;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     line-height: 1.3;
     margin: 0;
     @include text-clamp(2);
