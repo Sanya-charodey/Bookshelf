@@ -19,7 +19,8 @@ import AppSidebar from './components/layout/AppSidebar.vue';
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/assets/styles/variables' as *;
 .app {
     height: 100vh;
     display: flex;
@@ -30,7 +31,7 @@ import AppSidebar from './components/layout/AppSidebar.vue';
 .app__header {
     height: 64px;
     flex-shrink: 0;
-    padding: 20px 0 0 0;
+    padding: $spacing-xl 0 0 0;
 }
 
 .app__body {
@@ -47,7 +48,7 @@ import AppSidebar from './components/layout/AppSidebar.vue';
 
 .app__main {
     flex: 1;
-    padding: 24px 32px;
+    padding: $spacing-lg $spacing-3xl;
     overflow-y: auto;
 }
 </style>

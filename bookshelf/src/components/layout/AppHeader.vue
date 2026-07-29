@@ -33,7 +33,7 @@ const auth = useAuthStore()
 .wrap {
     display: flex;
     justify-content: space-between;
-    padding: 0 12px;
+    padding: 0 $spacing-base;
 }
 
 .btn-wrap {
@@ -60,7 +60,7 @@ const auth = useAuthStore()
     color: $color-primary;
 
     &:hover {
-        background: rgba($color-primary, 0.06);
+        background: $hover-bg;
     }
 }
 
@@ -71,7 +71,7 @@ const auth = useAuthStore()
     &:hover {
         border-color: $color-primary;
         color: $color-primary;
-        background: rgba($color-primary, 0.04);
+        background: $hover-bg-subtle;
     }
 }
 </style>

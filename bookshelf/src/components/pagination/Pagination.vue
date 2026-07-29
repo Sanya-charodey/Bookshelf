@@ -86,7 +86,7 @@ function goTo(page: number) {
 
 .pagination__btn {
     min-width: 40px;
-    padding: 8px 12px;
+    padding: $spacing-xs $spacing-base;
     border: 1px solid $color-border;
     border-radius: $radius-sm;
     background: $color-white;
@@ -113,7 +113,7 @@ function goTo(page: number) {
 }
 
 .pagination__ellipsis {
-    padding: 8px 4px;
+    padding: $spacing-xs 4px;
     color: $color-text-light;
 }
 </style>

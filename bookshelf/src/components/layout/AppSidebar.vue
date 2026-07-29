@@ -68,7 +68,7 @@ const onSearch = () => {
     display: block;
     padding: 10px 0;
     font-size: $font-size-sm;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: $color-text-light;
@@ -78,12 +78,12 @@ const onSearch = () => {
     display: flex;
     flex-direction: column;
     gap: $spacing-sm;
-    padding-bottom: 16px;
+    padding-bottom: $spacing-md;
 }
 
 .sidebar__genre {
     display: block;
-    padding: 8px 12px;
+    padding: $spacing-xs $spacing-base;
     border: 1px solid $color-border;
     border-radius: $radius-sm;
     cursor: pointer;
@@ -95,14 +95,14 @@ const onSearch = () => {
 
 .sidebar__genre:hover {
     border-color: $color-primary;
-    background: rgba($color-primary, 0.04);
+    background: $hover-bg-subtle;
 }
 
 .sidebar__genre--checked {
     border-color: $color-primary;
     color: $color-primary;
-    font-weight: 500;
-    background: rgba($color-primary, 0.06);
+    font-weight: $font-weight-medium;
+    background: $hover-bg;
 }
 
 .sidebar__checkbox {
@@ -131,7 +131,7 @@ const onSearch = () => {
 
 .sidebar__input {
     flex: 1;
-    padding: 8px 12px;
+    padding: $spacing-xs $spacing-base;
     border: 1px solid $color-border;
     border-radius: $radius-sm;
     font-size: $font-size-btn;
@@ -155,26 +155,26 @@ const onSearch = () => {
 
 .sidebar__my-book {
     display: block;
-    padding: 8px 16px;
+    padding: $spacing-xs $spacing-md;
     border: 1px solid $color-primary;
     border-radius: $radius-sm;
     color: $color-primary;
     font-size: $font-size-btn;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
     text-align: center;
     text-decoration: none;
     background: transparent;
     transition: all $transition-fast;
 
     &:hover {
-        background: rgba($color-primary, 0.06);
+        background: $hover-bg;
     }
 }
 
 .sidebar__clear {
     display: block;
     width: 100%;
-    padding: 8px 12px;
+    padding: $spacing-xs $spacing-base;
     border: 1px solid $color-border;
     border-radius: $radius-sm;
     font-size: $font-size-btn;
@@ -186,7 +186,7 @@ const onSearch = () => {
     &:hover {
         border-color: $color-primary;
         color: $color-primary;
-        background: rgba($color-primary, 0.04);
+        background: $hover-bg-subtle;
     }
 }
 </style>
