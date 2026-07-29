@@ -199,6 +199,7 @@ onUnmounted(() => {
 .book {
     display: flex;
     gap: 40px;
+    align-items: flex-start;
 }
 
 .book__cover {
@@ -222,10 +223,18 @@ onUnmounted(() => {
     font-size: $font-size-btn;
 }
 
+.book__wrap {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-base;
+}
+
 .book__info {
     display: flex;
     flex-direction: column;
     gap: $spacing-base;
+    flex: 1;
+    min-width: 0;
 }
 
 .book__title {
@@ -280,6 +289,92 @@ onUnmounted(() => {
 
 .book__link:hover {
     text-decoration: underline;
+}
+
+.status-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px $spacing-base;
+    border: 1px solid $color-primary;
+    border-radius: $radius-sm;
+    font-size: $font-size-btn;
+    color: $color-primary;
+    background: transparent;
+    cursor: pointer;
+    transition: background $transition-fast;
+
+    &:hover {
+        background: rgba($color-primary, 0.06);
+    }
+}
+
+.status-btn--active {
+    background: rgba($color-primary, 0.06);
+}
+
+.status-dropdown {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    overflow: hidden;
+    background: $color-white;
+}
+
+.status-dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px $spacing-base;
+    border: none;
+    font-size: $font-size-btn;
+    color: $color-text-primary;
+    background: none;
+    cursor: pointer;
+    transition: background $transition-fast;
+
+    &:hover {
+        background: $color-cover-bg;
+    }
+}
+
+.status-dropdown__item--active {
+    color: $color-primary;
+    font-weight: 500;
+}
+
+.status-dropdown__icon {
+    flex-shrink: 0;
+}
+
+.status-dropdown__check {
+    margin-left: auto;
+    color: $color-primary;
+}
+
+.status-dropdown__divider {
+    height: 1px;
+    background: $color-border;
+    margin: 4px 0;
+}
+
+.status-dropdown__remove {
+    display: block;
+    width: 100%;
+    padding: 8px $spacing-base;
+    border: none;
+    font-size: $font-size-btn;
+    color: #e74c3c;
+    background: none;
+    cursor: pointer;
+    transition: background $transition-fast;
+
+    &:hover {
+        background: $color-cover-bg;
+    }
 }
 
 .status-dropdown__prompt {
