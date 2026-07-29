@@ -85,9 +85,7 @@ const onSearch = () => {
 }
 
 .sidebar__genre {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: block;
     padding: 8px 12px;
     border: 1px solid $color-border;
     border-radius: $radius-sm;
@@ -111,7 +109,15 @@ const onSearch = () => {
 }
 
 .sidebar__checkbox {
-    accent-color: $color-primary;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .sidebar__wrap-btn {
