@@ -20,7 +20,7 @@
                     </button>
 
                     <div v-if="dropdownOpen" class="status-dropdown">
-                        <template v-if="!authStore.isAuthenticated && !selectedStatus">
+                        <template v-if="!authStore.isAuthenticated">
                             <div class="status-dropdown__prompt">
                                 Войдите, чтобы добавлять книги на полку
                             </div>
@@ -145,6 +145,7 @@ function handleClickOutside(e: MouseEvent) {
 }
 
 function selectStatus(value: StatusValue) {
+    if (!authStore.isAuthenticated) return
     statusStore.setStatus(id, value)
     if (store.selectBook) {
         shelfStore.addBook(store.selectBook)
@@ -153,6 +154,7 @@ function selectStatus(value: StatusValue) {
 }
 
 function removeStatus() {
+    if (!authStore.isAuthenticated) return
     statusStore.removeStatus(id)
     shelfStore.removeBook(id)
     dropdownOpen.value = false
