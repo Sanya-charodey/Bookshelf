@@ -16,6 +16,38 @@ export function workIdFromKey(key: string): string {
   return key.replace(/^\/works\//, '')
 }
 
+function titleCase(value: string): string {
+  return value
+    .split(/\s+/)
+    .map((word) => (word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : word))
+    .join(' ')
+}
+
+export function normalizeCategories(subjects?: string[]): string[] {
+  if (!subjects) return []
+
+  const seen = new Set<string>()
+  const result: string[] = []
+
+  for (const subject of subjects) {
+    const parts = subject
+      .split(/[,/]/)
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map(titleCase)
+
+    for (const part of parts) {
+      const key = part.toLowerCase()
+      if (!seen.has(key)) {
+        seen.add(key)
+        result.push(part)
+      }
+    }
+  }
+
+  return result
+}
+
 function coverUrl(coverId?: number): ImageLinks | undefined {
   if (!coverId) return undefined
 
@@ -46,7 +78,7 @@ export function mapSearchDocToBook(doc: OpenLibrarySearchDoc): Book {
       description: parseTextField(doc.first_sentence),
       publishedDate: doc.first_publish_year?.toString() ?? '',
       pageCount: doc.number_of_pages_median ?? 0,
-      categories: doc.subject ?? [],
+      categories: normalizeCategories(doc.subject),
       imageLinks: coverUrl(doc.cover_i),
       averageRating: formatRating(doc.ratings_average),
       previewLink: `${BASE_URL}/works/${id}`,
@@ -66,7 +98,7 @@ export function mapWorkToBook(work: OpenLibraryWork, authorNames: string[]): Boo
       description: parseTextField(work.description),
       publishedDate: work.first_publish_date ?? '',
       pageCount: 0,
-      categories: work.subjects ?? [],
+      categories: normalizeCategories(work.subjects),
       imageLinks: coverUrl(work.covers?.[0]),
       averageRating: undefined,
       previewLink,
