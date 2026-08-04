@@ -229,6 +229,7 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: $spacing-base;
+    max-width: 200px;
 }
 
 .book__info {
